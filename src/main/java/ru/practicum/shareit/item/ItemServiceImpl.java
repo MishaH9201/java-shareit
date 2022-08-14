@@ -3,6 +3,7 @@ package ru.practicum.shareit.item;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.UserRepository;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ import java.util.List;
 @RequiredArgsConstructor
 class ItemServiceImpl implements ItemService {
     private final ItemRepository repository;
+    private final UserRepository userRepository;
 
     @Override
     public List<Item> getItems(long userId) {
@@ -17,8 +19,8 @@ class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item addNewItem(long userId, Item item) {
-       // item.setUserId(userId);
+    public Item addNewItem( Item item) {
+       userRepository.getUserById(item.getUserId());
         return repository.save(item);
     }
 

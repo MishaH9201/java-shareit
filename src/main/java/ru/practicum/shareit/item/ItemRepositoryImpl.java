@@ -1,7 +1,10 @@
 package ru.practicum.shareit.item;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.*;
 
@@ -17,7 +20,7 @@ public class ItemRepositoryImpl implements ItemRepository {
     @Override
     public Item save(Item item) {
         item.setId(getId());
-        items.compute(item.getOwner().getId(), (userId, userItems) -> {
+        items.compute(item.getUserId()/*item.getOwner().getId()*/, (userId, userItems) -> {
             if(userItems == null) {
                 userItems = new ArrayList<>();
             }
@@ -37,7 +40,16 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
     @Override
     public Item updateItem(long userId, Item item){
-       // if ()
+        Item itemUpdate=items.values()
+                .stream()
+                .flatMap(Collection::stream)
+                .filter(e->e.getId()==item.getId())
+                .findAny()
+                .orElse(null);
+        if(itemUpdate == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,"Item not found");
+        }
+       // if()
         return null;
     }
 

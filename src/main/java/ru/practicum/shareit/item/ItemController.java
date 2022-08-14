@@ -2,36 +2,44 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.dto.ItemDto;
 
+import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/items")
+@RequestMapping(path ="/items")
 @RequiredArgsConstructor
 public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public List<Item> get(@RequestHeader("X-Later-User-Id") long userId) {
-        return itemService.getItems(userId);
+    public List<ItemDto> get(@RequestHeader("X-Sharer-User-Id") long userId) {
+        return itemService.getItems(userId)
+                .stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 
     @PostMapping
-    public Item add(@RequestHeader("X-Later-User-Id") Long userId,
-                    @RequestBody Item item) {
-        return itemService.addNewItem(userId, item);
+    public ItemDto add(@Valid @RequestHeader("X-Sharer-User-Id") Long userId,
+                    @Valid @RequestBody ItemDto itemDto) {
+        Item item=ItemMapper.toItem(itemDto,userId);
+      //  itemService.addNewItem(item);
+        return ItemMapper.toItemDto(itemService.addNewItem(item));
     }
 
     @DeleteMapping("/{itemId}")
-    public void deleteItem(@RequestHeader("X-Later-User-Id") long userId,
+    public void deleteItem(@RequestHeader("X-Sharer-User-Id") long userId,
                            @PathVariable long itemId) {
         itemService.deleteItem(userId, itemId);
     }
     @PatchMapping
-    public Item update(@RequestHeader("X-Later-User-Id") Long userId,
-                       @RequestBody Item item) {
-        return itemService.updateItem(userId, item);
+    public ItemDto update(@Valid @RequestHeader("X-Sharer-User-Id") Long userId,
+                       @Valid @RequestBody ItemDto itemDto) {
+        Item item=ItemMapper.toItem(itemDto,userId);
+        return ItemMapper.toItemDto(itemService.updateItem(userId, item));
     }
 }
