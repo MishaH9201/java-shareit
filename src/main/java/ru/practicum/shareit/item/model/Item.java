@@ -1,19 +1,23 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.Data;
-import ru.practicum.shareit.user.User;
+import ru.practicum.shareit.user.model.User;
 
-import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
-/**
- * // TODO .
- */
+
 @Data
 public class Item {
     private Long id;
+    @NotNull
+    @NotBlank
     private String name;
+    @NotNull
     private String description;
+    @NotNull
     private Boolean available;
-    private User owner;
+    private Long userId;
+   // private User owner;
     private String request;
 }

@@ -2,23 +2,29 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.user.UserRepository;
+import ru.practicum.shareit.user.UserRepositoryImpl;
+import ru.practicum.shareit.user.dto.dto.ItemDto;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 class ItemServiceImpl implements ItemService {
     private final ItemRepository repository;
+    private final UserRepository userRepository;
 
     @Override
-    public List<Item> getItems(long userId) {
+    public List<ItemDto> getItems(long userId) {
         return repository.findByUserId(userId);
     }
 
     @Override
-    public Item addNewItem(long userId, Item item) {
-       // item.setUserId(userId);
+    public ItemDto addNewItem( ItemDto item) {
+       userRepository.getUserById(item.getUserId());
         return repository.save(item);
     }
 
@@ -28,7 +34,7 @@ class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item updateItem(long userId, Item item) {
+    public Item updateItem(long userId, ItemDto item) {
         return repository.updateItem(userId, item);
     }
 }
