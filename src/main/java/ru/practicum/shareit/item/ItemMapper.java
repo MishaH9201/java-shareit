@@ -10,8 +10,6 @@ public class ItemMapper {
                 item.getName(),
                 item.getDescription(),
                 item.getAvailable()
-                //userId
-               // item.getRequest() != null ? item.getRequest().getId() : null
         );
     }
     public static Item toItem(ItemDto item,Long userId) {
@@ -21,8 +19,6 @@ public class ItemMapper {
                 item.getDescription(),
                 item.getAvailable(),
                 userId,
-               //  item.getRequest() != null ? item.getRequest().getId() : null
-               // item.getRequest()
                 null
         );
     }
