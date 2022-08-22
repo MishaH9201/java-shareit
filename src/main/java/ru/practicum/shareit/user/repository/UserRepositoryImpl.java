@@ -75,9 +75,10 @@ public class UserRepositoryImpl implements UserRepository {
         if (user.getEmail() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No email");
         }
-        if (users.values().stream().
-                map(User::getEmail).
-                anyMatch(user.getEmail()::equals)) {
+        if (users.values()
+                .stream()
+                .map(User::getEmail)
+                .anyMatch(user.getEmail()::equals)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
         }
     }
