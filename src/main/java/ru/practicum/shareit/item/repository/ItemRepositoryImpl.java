@@ -55,7 +55,7 @@ public class ItemRepositoryImpl implements ItemRepository {
         }
         Item updateItem = new Item();
         for (Item it : items.get(userId)) {
-            if (it.getId() == item.getId()) {
+            if (it.getId().equals(item.getId())) {
                 if (item.getName() != null) {
                     it.setName(item.getName());
                 }
