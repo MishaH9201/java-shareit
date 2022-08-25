@@ -75,18 +75,14 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public Item getItemById(Long userId, Long itemId) {
-        Item item = items.values()
+        return items.values()
                 .stream()
                 .flatMap(Collection::stream)
                 .filter(e -> e.getId().equals(itemId))
                 .findFirst()
-                .orElse(null);
-        if (item == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found");
-        } else {
-            return item;
-        }
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
     }
+
 
     private long getId() {
         long lastId = items.values()

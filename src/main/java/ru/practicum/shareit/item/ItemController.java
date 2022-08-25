@@ -8,45 +8,41 @@ import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/items")
 @RequiredArgsConstructor
 public class ItemController {
     private final ItemService itemService;
+    public static final String USER_ID = "X-Sharer-User-Id";
 
     @GetMapping
-    public List<ItemDto> get(@RequestHeader("X-Sharer-User-Id") long userId) {
-        return itemService.getItems(userId)
-                .stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+    public List<ItemDto> get(@RequestHeader(USER_ID) long userId) {
+        return itemService.getItems(userId);
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getById(@RequestHeader("X-Sharer-User-Id") long userId,
+    public ItemDto getById(@RequestHeader(USER_ID) long userId,
                            @PathVariable("itemId") long itemId) {
         itemService.getItemById(userId, itemId);
         return ItemMapper.toItemDto(itemService.getItemById(userId, itemId));
     }
 
     @PostMapping
-    public ItemDto add(@Valid @RequestHeader("X-Sharer-User-Id") Long userId,
+    public ItemDto add(@Valid @RequestHeader(USER_ID) Long userId,
                        @Valid @RequestBody ItemDto itemDto) {
         Item item = ItemMapper.toItem(itemDto, userId);
-        //  itemService.addNewItem(item);
         return ItemMapper.toItemDto(itemService.addNewItem(item));
     }
 
     @DeleteMapping("/{itemId}")
-    public void deleteItem(@RequestHeader("X-Sharer-User-Id") long userId,
+    public void deleteItem(@RequestHeader(USER_ID) long userId,
                            @PathVariable long itemId) {
         itemService.deleteItem(userId, itemId);
     }
 
     @PatchMapping("/{itemId}")
-    public ItemDto update(@RequestHeader("X-Sharer-User-Id") Long userId,
+    public ItemDto update(@RequestHeader(USER_ID) Long userId,
                           @PathVariable long itemId,
                           @RequestBody ItemDto itemDto) {
         Item item = ItemMapper.toItem(itemDto, userId);
@@ -57,10 +53,6 @@ public class ItemController {
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text) {
         itemService.search(text);
-        return itemService.search(text)
-                .stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+        return itemService.search(text);
     }
-
 }

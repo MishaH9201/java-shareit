@@ -3,6 +3,8 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.item.ItemMapper;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -19,9 +21,12 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
 
     @Override
-    public List<Item> getItems(long userId) {
+    public List<ItemDto> getItems(long userId) {
         log.info("Get Items");
-        return repository.findByUserId(userId);
+        return repository.findByUserId(userId)
+                .stream()
+                .map(ItemMapper::toItemDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -51,16 +56,21 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<Item> search(String text) {
+    public List<ItemDto> search(String text) {
         if (text.isBlank()) {
             return new ArrayList<>();
         } else {
             return repository.getAll()
                     .stream()
-                    .filter(item -> item.getName().toLowerCase().contains(text.toLowerCase())
-                            || item.getDescription().toLowerCase().contains(text.toLowerCase())
-                            && item.getAvailable() == true)
+                    .filter(e -> filteringForSearch(e, text))
+                    .map(ItemMapper::toItemDto)
                     .collect(Collectors.toList());
         }
+    }
+
+    private Boolean filteringForSearch(Item item, String text) {
+        return item.getName().toLowerCase().contains(text.toLowerCase())
+                || item.getDescription().toLowerCase().contains(text.toLowerCase())
+                && item.getAvailable();
     }
 }
