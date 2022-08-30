@@ -37,7 +37,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item addNewItem(Item item) {
-        userRepository.getUserById(item.getUserId());
+        userRepository.findById(item.getUserId());
         log.info("Add new Item");
         return repository.save(item);
     }
@@ -50,7 +50,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item updateItem(long userId, Item item) {
-        userRepository.getUserById(userId);
+        userRepository.findById(userId);
         log.info("Update Items");
         return repository.updateItem(userId, item);
     }
