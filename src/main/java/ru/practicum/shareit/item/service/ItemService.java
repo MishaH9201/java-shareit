@@ -8,13 +8,13 @@ import java.util.List;
 public interface ItemService {
     Item getItemById(Long userId, Long itemId);
 
-    Item addNewItem(Item item);
+    Item addNewItem(ItemDto item,Long userId);
 
     List<ItemDto> getItems(long userId);
 
     void deleteItem(long userId, long itemId);
 
-    Item updateItem(long userId, Item item);
+    Item updateItem(long userId, ItemDto item);
 
     List<ItemDto> search(String text);
 }

@@ -34,6 +34,7 @@ public class UserController {
     @PostMapping
     public UserDto saveNewUser( @RequestBody @Validated(Create.class) UserDto userDto) {
         User user = UserMapper.toUser(userDto);
+        userService.saveUser(user);
         return UserMapper.toUserDto(userService.saveUser(user));
     }
 

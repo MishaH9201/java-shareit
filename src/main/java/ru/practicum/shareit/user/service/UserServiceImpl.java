@@ -47,6 +47,7 @@ public class UserServiceImpl implements UserService {
         if (user.getName() != null) {
             userUpdate.setName(user.getName());
         }
+     repository.save(userUpdate);
        // users.put(id, userUpdate);
         return userUpdate;
     }

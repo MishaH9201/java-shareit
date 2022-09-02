@@ -31,8 +31,7 @@ public class ItemController {
     @PostMapping
     public ItemDto add(@Valid @RequestHeader(USER_ID) Long userId,
                        @Valid @RequestBody ItemDto itemDto) {
-        Item item = ItemMapper.toItem(itemDto, userId);
-        return ItemMapper.toItemDto(itemService.addNewItem(item));
+        return ItemMapper.toItemDto(itemService.addNewItem(itemDto, userId));
     }
 
     @DeleteMapping("/{itemId}")
@@ -45,9 +44,10 @@ public class ItemController {
     public ItemDto update(@RequestHeader(USER_ID) Long userId,
                           @PathVariable long itemId,
                           @RequestBody ItemDto itemDto) {
-        Item item = ItemMapper.toItem(itemDto, userId);
-        item.setId(itemId);
-        return ItemMapper.toItemDto(itemService.updateItem(userId, item));
+       // Item item = ItemMapper.toItem(itemDto, userId);
+        itemDto.setId(itemId);
+        itemService.updateItem(userId, itemDto);
+        return ItemMapper.toItemDto(itemService.updateItem(userId, itemDto));
     }
 
     @GetMapping("/search")
