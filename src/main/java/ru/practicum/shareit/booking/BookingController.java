@@ -3,10 +3,9 @@ package ru.practicum.shareit.booking;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingDtoForUpdate;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.ItemController;
-import ru.practicum.shareit.item.ItemMapper;
-import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -16,7 +15,7 @@ import java.util.List;
 @RequestMapping(path = "/bookings")
 public class BookingController {
 
-private final BookingService bookingService;
+    private final BookingService bookingService;
    /* @GetMapping
     public List<ItemDto> get(@RequestHeader(ItemController.USER_ID) long userId) {
         return itemService.getItems(userId);
@@ -32,26 +31,33 @@ private final BookingService bookingService;
     @PostMapping
     public BookingDto add(@Valid @RequestHeader(ItemController.USER_ID) Long userId,
                           @Valid @RequestBody BookingDto bookingDto) {
-        return BookingMapper.toBookingDto(bookingService.save(bookingDto, userId));
+        Booking booking = bookingService.save(bookingDto, userId);
+        return BookingMapper.toBookingDto(booking);
     }
 
 
-
-    @PatchMapping("/{bookingId}?approved={approved}")
-    public BookingDto update(@RequestHeader(ItemController.USER_ID) Long userId,
-                          @PathVariable long itemId,
-                          @RequestBody ItemDto itemDto) {
-        // Item item = ItemMapper.toItem(itemDto, userId);
-       // itemDto.setId(itemId);
-      //  itemService.updateItem(userId, itemDto);
-     //   return ItemMapper.toItemDto(itemService.updateItem(userId, itemDto));
-        return null;
+    @PatchMapping("/{bookingId}")
+    public BookingDtoForUpdate update(@RequestHeader(ItemController.USER_ID) Long userId,
+                                      @PathVariable long bookingId,
+                                      @RequestParam(value = "approved") boolean approved) {
+        Booking booking = bookingService.update(userId, bookingId, approved);
+        return BookingMapper.toBookingDtoForUpdate(booking);
     }
 
-   /* @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam String text) {
-        itemService.search(text);
-        return itemService.search(text);
-    }*/
+    @GetMapping("/{bookingId}")
+    public BookingDtoForUpdate findBookingById(//@RequestHeader(ItemController.USER_ID) Long userId,
+                                               @PathVariable long bookingId) {
+        return bookingService.findBookingById(bookingId);
+    }
 
+    @GetMapping
+    public List<BookingDtoForUpdate> findAllBookingsByUserId(@RequestHeader(ItemController.USER_ID) Long userId,
+                                                         @RequestParam(required = false, defaultValue = "ALL") String state) {
+        return bookingService.findAllBookingsByUserId(userId,state);
+    }
+    @GetMapping("/owner")
+    public List<BookingDtoForUpdate> findAllBookingsForItemsUser(@RequestHeader(ItemController.USER_ID) Long userId,
+                                                                 @RequestParam(required = false, defaultValue = "ALL") String state) {
+        return bookingService.findAllBookingsForItemsUser(userId, state);
+    }
 }
