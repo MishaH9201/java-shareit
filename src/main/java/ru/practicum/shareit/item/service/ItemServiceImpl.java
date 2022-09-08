@@ -108,7 +108,8 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST," "));
         User creator = userRepository.findById(userId)
                 .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found"));
-        Booking booking = bookingRepository.findBookingForCheck(userId, itemId);
+        Booking booking = bookingRepository.findBookingForCheck(userId, itemId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST," "));
 
       //  if (booking.isEmpty() || booking.get().getEnd().isAfter(LocalDateTime.now()))
       //      throw new BadRequestException("Этот пользователь не может оставить комментарий");

@@ -25,7 +25,7 @@ public class ItemController {
 
     @GetMapping("/{itemId}")
     public ItemDtoForComments getById(@RequestHeader(USER_ID) long userId,
-                           @PathVariable("itemId") long itemId) {
+                                      @PathVariable("itemId") long itemId) {
         return itemService.getItemById(userId, itemId);
     }
 
@@ -55,17 +55,12 @@ public class ItemController {
         itemService.search(text);
         return itemService.search(text);
     }
+
     @PostMapping("{itemId}/comment")
-    public CommentDto addComment( @RequestHeader(USER_ID) Long userId,
-                                  @RequestBody CommentDto commentDto,
-                                 @PathVariable long itemId
-    ) {
+    public CommentDto addComment(@RequestHeader(USER_ID) Long userId,
+                                @Valid @RequestBody CommentDto commentDto,
+                                 @PathVariable long itemId) {
         return itemService.createComment(commentDto, userId, itemId);
-    }
-    @GetMapping("/s")
-    public List<ItemDto> seaaarch(@RequestParam String text) {
-        itemService.search(text);
-        return itemService.search(text);
     }
 
 }

@@ -45,3 +45,4 @@ CREATE TABLE IF NOT EXISTS comments(
 SELECT * FROM items;
 SELECT * FROM users;
 SELECT * FROM bookings;
+SELECT * FROM comments;

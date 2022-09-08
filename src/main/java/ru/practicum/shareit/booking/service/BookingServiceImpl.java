@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository repository;
     private final UserRepository userRepository;
-
     private final ItemRepository itemRepository;
 
     public Booking save(BookingDto bookingDto, Long userId) {
@@ -76,9 +75,14 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingDtoForUpdate findBookingById(long bookingId) {
-        return BookingMapper.toBookingDtoForUpdate(repository.findById(bookingId)
+    public BookingDtoForUpdate findBookingById(long bookingId,long userId) {
+      //  userRepository.findById(userId)
+      //          .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        BookingDtoForUpdate bookingDto = BookingMapper.toBookingDtoForUpdate(repository.findById(bookingId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found")));
+        if(userId !=bookingDto.getItem().getOwner().getId() && userId != bookingDto.getBooker().getId()){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User can't get booking");
+        }return bookingDto;
     }
 
     @Override
@@ -88,7 +92,7 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings;
         switch (state) {
             case "ALL":
-                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.APPROVED)
+                bookings = repository.findByBookerId(userId)
                         .stream()
                         .sorted((o1, o2) -> o2.getStart().compareTo(o1.getStart()))
                         .collect(Collectors.toList());

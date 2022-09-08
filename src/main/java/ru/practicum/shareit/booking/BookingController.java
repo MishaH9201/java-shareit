@@ -35,9 +35,9 @@ public class BookingController {
     }
 
     @GetMapping("/{bookingId}")
-    public BookingDtoForUpdate findBookingById(//@RequestHeader(ItemController.USER_ID) Long userId,
+    public BookingDtoForUpdate findBookingById(@RequestHeader(ItemController.USER_ID) Long userId,
                                                @PathVariable long bookingId) {
-        return bookingService.findBookingById(bookingId);
+        return bookingService.findBookingById(bookingId,userId);
     }
 
     @GetMapping

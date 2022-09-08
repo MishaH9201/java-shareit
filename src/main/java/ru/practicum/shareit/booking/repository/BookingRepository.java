@@ -6,6 +6,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByBookerId(Long userId);
@@ -55,9 +56,15 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("select b from Booking b " +
             " left join Item c on b.item.id = c.id " +
             " where b.booker.id = ?1 and b.end > current_timestamp " +
-            "and c.id = ?1"+
+            "and c.id = ?2 "+
             "and upper( b.status) = 'APPROVED'" +
-            "order by b.start desc")
-Booking findBookingForCheck(Long bookerId,Long itemId);
+            "order by b.start desc "
+            )
+    Optional<Booking> findBookingForCheck(Long bookerId, Long itemId);
 }
 
+/*@Query(value = "select it.user_id, count(it.id) as count "+
+        "from items as it left join users as us on it.user_id = us.id "+
+        "where (cast(us.registration_date as date)) between ?1 and ?2 "+
+        "group by it.user_id", nativeQuery = true)
+"select b from Booking b left join Item i on b.item.id = i.id where i.owner.id = ?1 order by b.start desc")*/

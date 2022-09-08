@@ -11,7 +11,7 @@ public interface BookingService {
 
     Booking update(Long userId, long bookingId, boolean approved);
 
-    BookingDtoForUpdate findBookingById( long bookingId);
+    BookingDtoForUpdate findBookingById( long bookingId,long userId);
 
     List<BookingDtoForUpdate> findAllBookingsByUserId(Long userId,String state);
 
