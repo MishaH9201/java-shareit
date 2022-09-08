@@ -5,13 +5,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.ItemDtoForComments;
+import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,21 +30,27 @@ import java.util.stream.Collectors;
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository repository;
     private final UserRepository userRepository;
+    private final BookingRepository bookingRepository;
+    private final CommentRepository commentRepository;
 
     @Override
-    public List<ItemDto> getItems(long userId) {
+    public List<ItemDtoForComments> getItems(long userId) {
+        List<Comment> comments=commentRepository.findByAuthorId(userId);
         log.info("Get Items");
         return repository.findByOwnerId(userId)
                 .stream()
-                .map(ItemMapper::toItemDto)
+                .map(o -> ItemMapper.toItemDtoForComments(o,comments))
+               // .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public Item getItemById(Long userId, Long itemId) {
+    public ItemDtoForComments getItemById(Long userId, Long itemId) {
+        List<Comment> comments=commentRepository.findByAuthorId(userId);
         log.info("Get Item by id");
-        return repository.findById(itemId)
+        Item item = repository.findById(itemId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
+        return ItemMapper.toItemDtoForComments(item,comments);
     }
 
     @Override
@@ -86,5 +100,23 @@ public class ItemServiceImpl implements ItemService {
                    .map(ItemMapper::toItemDto)
                     .collect(Collectors.toList());
        }
+    }
+
+    @Override
+    public CommentDto createComment(CommentDto commentDto, long userId, long itemId) {
+        Item item = repository.findById(itemId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST," "));
+        User creator = userRepository.findById(userId)
+                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found"));
+        Booking booking = bookingRepository.findBookingForCheck(userId, itemId);
+
+      //  if (booking.isEmpty() || booking.get().getEnd().isAfter(LocalDateTime.now()))
+      //      throw new BadRequestException("Этот пользователь не может оставить комментарий");
+        commentDto.setCreated(LocalDateTime.now());
+        commentDto.setItem(item);
+        commentDto.setAuthor(creator);
+        Comment comment = commentRepository.save(CommentMapper.toComment(commentDto));
+        log.info("Пользователь с id={} добавил комментарий к вещи с id={}", userId, itemId);
+        return CommentMapper.toCommentDto(comment);
     }
 }

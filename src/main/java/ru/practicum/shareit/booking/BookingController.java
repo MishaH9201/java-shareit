@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoForUpdate;
+import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.ItemController;
 
@@ -16,17 +17,6 @@ import java.util.List;
 public class BookingController {
 
     private final BookingService bookingService;
-   /* @GetMapping
-    public List<ItemDto> get(@RequestHeader(ItemController.USER_ID) long userId) {
-        return itemService.getItems(userId);
-    }
-
-    @GetMapping("/{itemId}")
-    public ItemDto getById(@RequestHeader(ItemController.USER_ID) long userId,
-                           @PathVariable("itemId") long itemId) {
-        itemService.getItemById(userId, itemId);
-        return ItemMapper.toItemDto(itemService.getItemById(userId, itemId));
-    }*/
 
     @PostMapping
     public BookingDto add(@Valid @RequestHeader(ItemController.USER_ID) Long userId,
@@ -52,9 +42,10 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDtoForUpdate> findAllBookingsByUserId(@RequestHeader(ItemController.USER_ID) Long userId,
-                                                         @RequestParam(required = false, defaultValue = "ALL") String state) {
-        return bookingService.findAllBookingsByUserId(userId,state);
+                                                             @RequestParam(required = false, defaultValue = "ALL") String state) {
+        return bookingService.findAllBookingsByUserId(userId, state);
     }
+
     @GetMapping("/owner")
     public List<BookingDtoForUpdate> findAllBookingsForItemsUser(@RequestHeader(ItemController.USER_ID) Long userId,
                                                                  @RequestParam(required = false, defaultValue = "ALL") String state) {
