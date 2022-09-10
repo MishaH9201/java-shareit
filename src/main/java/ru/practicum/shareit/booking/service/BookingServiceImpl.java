@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.BookingMapper;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingDtoForUpdate;
@@ -18,7 +18,6 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +34,6 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         Item item = itemRepository.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
-        ;
         if (user.equals(item.getOwner())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You can't pick up your item");
         }
@@ -51,6 +49,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = BookingMapper.toBooking(bookingDto);
         booking.setItem(item);
         booking.setStatus(BookingStatus.WAITING);
+        log.info("Add new Booking");
         return repository.save(booking);
     }
 
@@ -61,28 +60,28 @@ public class BookingServiceImpl implements BookingService {
         if (!userId.equals(booking.getItem().getOwner().getId())) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Only the owner can confirm");
         }
-            if(booking.getStatus()==BookingStatus.APPROVED){
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "\n" +
-                        "Approved status cannot be changed");
-            }
-
+        if (booking.getStatus() == BookingStatus.APPROVED || booking.getStatus() == BookingStatus.REJECTED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "\n" +
+                    "Status cannot be changed");
+        }
         if (approved) {
             booking.setStatus(BookingStatus.APPROVED);
         } else {
             booking.setStatus(BookingStatus.REJECTED);
         }
+        log.info("Update status booking");
         return repository.save(booking);
     }
 
     @Override
-    public BookingDtoForUpdate findBookingById(long bookingId,long userId) {
-      //  userRepository.findById(userId)
-      //          .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    public BookingDtoForUpdate findBookingById(long bookingId, long userId) {
         BookingDtoForUpdate bookingDto = BookingMapper.toBookingDtoForUpdate(repository.findById(bookingId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found")));
-        if(userId !=bookingDto.getItem().getOwner().getId() && userId != bookingDto.getBooker().getId()){
+        log.info("Get booking");
+        if (userId != bookingDto.getItem().getOwner().getId() && userId != bookingDto.getBooker().getId()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User can't get booking");
-        }return bookingDto;
+        }
+        return bookingDto;
     }
 
     @Override
@@ -98,28 +97,31 @@ public class BookingServiceImpl implements BookingService {
                         .collect(Collectors.toList());
                 break;
             case "CURRENT":
-                 bookings=repository.findCorrentBookingsByBookerId(userId);
+                bookings = repository.findCorrentBookingsByBookerId(userId);
                 break;
             case "PAST":
-                bookings=repository.findPastBookingsByBookerId(userId);
+                bookings = repository.findPastBookingsByBookerId(userId);
                 break;
             case "FUTURE":
-                bookings=repository.findUpcomingBookingsByBookerId(userId);
+                bookings = repository.findUpcomingBookingsByBookerId(userId);
                 break;
             case "WAITING":
-                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.WAITING);
+                bookings = repository.findByBooker_IdAndStatus(userId, BookingStatus.WAITING);
+                break;
             case "REJECTED":
-                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.REJECTED);
+                bookings = repository.findByBooker_IdAndStatus(userId, BookingStatus.REJECTED);
                 break;
             default:
-              throw new BedRequestException("Unknown state: "+state);
+                throw new BedRequestException("Unknown state: " + state);
         }
+        log.info("Get booking by user");
         return bookings
                 .stream()
                 .map(BookingMapper::toBookingDtoForUpdate)
                 .collect(Collectors.toList());
     }
-    public  List<BookingDtoForUpdate> findAllBookingsForItemsUser(Long userId,String state){
+
+    public List<BookingDtoForUpdate> findAllBookingsForItemsUser(Long userId, String state) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         List<Booking> bookings;
@@ -137,13 +139,15 @@ public class BookingServiceImpl implements BookingService {
                 bookings = repository.findUpcomingBookingsItemsUser(userId);
                 break;
             case "WAITING":
-                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.WAITING);
+                bookings = repository.findByItemOwnerIdAndStatusWaiting(userId, BookingStatus.WAITING);
+                break;
             case "REJECTED":
-                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.REJECTED);
+                bookings = repository.findByItemOwnerIdAndStatusRejected(userId, BookingStatus.REJECTED);
                 break;
             default:
-                throw new BedRequestException("Unknown state: "+state);
+                throw new BedRequestException("Unknown state: " + state);
         }
+        log.info("Get booking by item");
         return bookings
                 .stream()
                 .map(BookingMapper::toBookingDtoForUpdate)

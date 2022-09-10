@@ -11,7 +11,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorMessege BadRequestException(final BedRequestException e) {
+    public ErrorMessege badRequestException(final BedRequestException e) {
         return new ErrorMessege(e.getMessage());
     }
 }

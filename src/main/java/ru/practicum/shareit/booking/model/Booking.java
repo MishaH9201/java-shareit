@@ -7,6 +7,7 @@ import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 import javax.persistence.*;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -20,14 +21,14 @@ public class Booking {
     @Column(name = "id")
     private Long id;
 
-    @Column(name="start_time")
+    @Column(name = "start_time")
     private LocalDateTime start;
 
-    @Column(name="end_time")
-    private LocalDateTime  end;
+    @Column(name = "end_time")
+    private LocalDateTime end;
 
     @ManyToOne
-    @JoinColumn(name="item_id")
+    @JoinColumn(name = "item_id")
     private Item item;
 
     @ManyToOne

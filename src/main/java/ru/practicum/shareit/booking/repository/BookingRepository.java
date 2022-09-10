@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByBookerId(Long userId);
 
-    List<Booking> findByBookerIdAndStatus(Long booker_id, BookingStatus status);
+    List<Booking> findByBooker_IdAndStatus(Long bookerId, BookingStatus status);
 
     @Query("select b from Booking b " +
             " where b.booker.id = ?1 and b.end > current_timestamp " +
@@ -53,18 +53,33 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             " where c.owner.id = ?1 and b.end < current_timestamp " +
             "order by b.start desc")
     List<Booking> findPastBookingsItemsUser(Long userId);
+
+    Optional<Booking> getTopByItem_IdAndBooker_IdOrderByEndAsc(Long itemId, Long userId);
+
     @Query("select b from Booking b " +
             " left join Item c on b.item.id = c.id " +
-            " where b.booker.id = ?1 and b.end > current_timestamp " +
-            "and c.id = ?2 "+
-            "and upper( b.status) = 'APPROVED'" +
-            "order by b.start desc "
-            )
-    Optional<Booking> findBookingForCheck(Long bookerId, Long itemId);
+            " where c.owner.id = ?1 and upper( b.status) = 'WAITING' " +
+            "order by b.start desc")
+    List<Booking> findByItemOwnerIdAndStatusWaiting(Long bookerId, BookingStatus status);
+
+    @Query("select b from Booking b " +
+            " left join Item c on b.item.id = c.id " +
+            " where c.owner.id = ?1 and upper( b.status) = 'REJECTED' " +
+            "order by b.start desc")
+    List<Booking> findByItemOwnerIdAndStatusRejected(Long bookerId, BookingStatus status);
+
+    @Query("SELECT b " +
+            "FROM Booking b " +
+            "WHERE b.item.id = ?1 AND upper(b.status) = 'APPROVED'" +
+            "AND b.end <= current_timestamp AND b.item.owner.id = ?2 " +
+            "ORDER BY b.end DESC ")
+    Optional<Booking> findLastBookingWithItemAndOwner(Long itemId, Long ownerId);
+
+    @Query("SELECT b " +
+            "FROM Booking b " +
+            "WHERE b.item.id = ?1 AND upper(b.status) = 'APPROVED'" +
+            "AND b.start >= current_timestamp AND b.item.owner.id = ?2 " +
+            "ORDER BY b.start ASC ")
+    Optional<Booking> findNextBookingWithItemAndOwner(Long itemId, Long ownerId);
 }
 
-/*@Query(value = "select it.user_id, count(it.id) as count "+
-        "from items as it left join users as us on it.user_id = us.id "+
-        "where (cast(us.registration_date as date)) between ?1 and ?2 "+
-        "group by it.user_id", nativeQuery = true)
-"select b from Booking b left join Item i on b.item.id = i.id where i.owner.id = ?1 order by b.start desc")*/
