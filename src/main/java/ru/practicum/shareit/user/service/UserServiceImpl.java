@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import ru.practicum.shareit.user.UserMapper;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -37,18 +37,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(Long id, User user) {
-       // log.info("Update user");
-       User userUpdate = repository.findById(id)
-               .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        User userUpdate = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         if (user.getEmail() != null) {
-           // checkRepeatEmail(user);
             userUpdate.setEmail(user.getEmail());
         }
         if (user.getName() != null) {
             userUpdate.setName(user.getName());
         }
-     repository.save(userUpdate);
-       // users.put(id, userUpdate);
+        repository.save(userUpdate);
+        log.info("Update user");
         return userUpdate;
     }
 
@@ -56,7 +54,7 @@ public class UserServiceImpl implements UserService {
     public User getUserById(Long id) {
         log.info("Get user");
         return repository.findById(id)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     @Override
@@ -64,15 +62,4 @@ public class UserServiceImpl implements UserService {
         log.info("Delete user");
         repository.deleteById(id);
     }
-   /* private void checkRepeatEmail(User user) {
-        if (user.getEmail() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No email");
-        }
-        if (users.values()
-                .stream()
-                .map(User::getEmail)
-                .anyMatch(user.getEmail()::equals)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already in use");
-        }
-    }*/
 }

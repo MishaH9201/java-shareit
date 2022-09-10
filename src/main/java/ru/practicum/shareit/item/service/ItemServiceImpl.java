@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
+import ru.practicum.shareit.booking.dto.BookingDtoShort;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -22,6 +24,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,29 +38,38 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDtoForComments> getItems(long userId) {
-        List<Comment> comments=commentRepository.findByAuthorId(userId);
+        List<Item> items = repository.findByOwnerIdOrderById(userId);
+        List<ItemDtoForComments> itemDtoList = new ArrayList<>();
+        for (Item i : items) {
+            List<CommentDto> comments = commentRepository.findByItemId(i.getId())
+                    .stream()
+                    .map(CommentMapper::toCommentDto)
+                    .collect(Collectors.toList());
+            itemDtoList.add(ItemMapper.toItemDtoForComments(i, comments, checkLastBooking(i.getId(), userId), checkNextBooking(i.getId(), userId)));
+        }
         log.info("Get Items");
-        return repository.findByOwnerId(userId)
-                .stream()
-                .map(o -> ItemMapper.toItemDtoForComments(o,comments))
-               // .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
+        return itemDtoList;
     }
 
     @Override
     public ItemDtoForComments getItemById(Long userId, Long itemId) {
-        List<Comment> comments=commentRepository.findByAuthorId(userId);
+        BookingDtoShort nextBooking = checkNextBooking(itemId, userId);
+        BookingDtoShort lastBooking = checkLastBooking(itemId, userId);
+        List<CommentDto> comments = commentRepository.findByItemId(itemId)
+                .stream()
+                .map(CommentMapper::toCommentDto)
+                .collect(Collectors.toList());
         log.info("Get Item by id");
         Item item = repository.findById(itemId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
-        return ItemMapper.toItemDtoForComments(item,comments);
+        return ItemMapper.toItemDtoForComments(item, comments, lastBooking, nextBooking);
     }
 
     @Override
     public Item addNewItem(ItemDto itemDto, Long userId) {
-       User user = userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-       Item item=ItemMapper.toItem(itemDto,user);
+        Item item = ItemMapper.toItem(itemDto, user);
         log.info("Add new Item");
         return repository.save(item);
     }
@@ -70,22 +82,22 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item updateItem(long userId, ItemDto item) {
-         userRepository.findById(userId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found"));
-        Item itemUpdate=repository.findById(item.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"Item not found"));
-        if (userId != itemUpdate.getOwner().getId()){
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Item belongs to another user");
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        Item itemUpdate = repository.findById(item.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
+        if (userId != itemUpdate.getOwner().getId()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Item belongs to another user");
         }
-            if (item.getName() != null) {
-                itemUpdate.setName(item.getName());
-            }
-            if (item.getDescription() != null) {
-                itemUpdate.setDescription(item.getDescription());
-            }
-            if (item.getAvailable() != null) {
-                itemUpdate.setAvailable(item.getAvailable());
-            }
+        if (item.getName() != null) {
+            itemUpdate.setName(item.getName());
+        }
+        if (item.getDescription() != null) {
+            itemUpdate.setDescription(item.getDescription());
+        }
+        if (item.getAvailable() != null) {
+            itemUpdate.setAvailable(item.getAvailable());
+        }
         log.info("Update Items");
         return repository.save(itemUpdate);
     }
@@ -97,27 +109,41 @@ public class ItemServiceImpl implements ItemService {
         } else {
             return repository.search(text)
                     .stream()
-                   .map(ItemMapper::toItemDto)
+                    .map(ItemMapper::toItemDto)
                     .collect(Collectors.toList());
-       }
+        }
     }
 
     @Override
     public CommentDto createComment(CommentDto commentDto, long userId, long itemId) {
         Item item = repository.findById(itemId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST," "));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item not found "));
         User creator = userRepository.findById(userId)
-                .orElseThrow(() ->  new ResponseStatusException(HttpStatus.NOT_FOUND,"User not found"));
-        Booking booking = bookingRepository.findBookingForCheck(userId, itemId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST," "));
-
-      //  if (booking.isEmpty() || booking.get().getEnd().isAfter(LocalDateTime.now()))
-      //      throw new BadRequestException("Этот пользователь не может оставить комментарий");
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        Optional<Booking> booking = bookingRepository.getTopByItem_IdAndBooker_IdOrderByEndAsc(itemId, userId);
+        if (booking.isEmpty() || booking.get().getEnd().isAfter(LocalDateTime.now()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time error");
         commentDto.setCreated(LocalDateTime.now());
-        commentDto.setItem(item);
-        commentDto.setAuthor(creator);
-        Comment comment = commentRepository.save(CommentMapper.toComment(commentDto));
-        log.info("Пользователь с id={} добавил комментарий к вещи с id={}", userId, itemId);
+        Comment comment = commentRepository.save(CommentMapper.toComment(commentDto, item, creator));
+        log.info("Add comment");
         return CommentMapper.toCommentDto(comment);
+    }
+
+    private BookingDtoShort checkLastBooking(long itemId, long ownerId) {
+        Booking lastBooking = bookingRepository.findLastBookingWithItemAndOwner(itemId, ownerId).orElse(null);
+        if (lastBooking == null) {
+            return null;
+        } else {
+            return BookingMapper.toBookingDtoShort(lastBooking);
+        }
+    }
+
+    private BookingDtoShort checkNextBooking(long itemId, long ownerId) {
+        Booking lastBooking = bookingRepository.findNextBookingWithItemAndOwner(itemId, ownerId).orElse(null);
+        if (lastBooking == null) {
+            return null;
+        } else {
+            return BookingMapper.toBookingDtoShort(lastBooking);
+        }
     }
 }

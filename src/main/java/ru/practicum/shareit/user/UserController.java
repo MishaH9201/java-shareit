@@ -4,9 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.Create;
-import ru.practicum.shareit.Update;
+import ru.practicum.shareit.util.Create;
+import ru.practicum.shareit.util.Update;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
@@ -32,7 +33,7 @@ public class UserController {
     }
 
     @PostMapping
-    public UserDto saveNewUser( @RequestBody @Validated(Create.class) UserDto userDto) {
+    public UserDto saveNewUser(@RequestBody @Validated(Create.class) UserDto userDto) {
         User user = UserMapper.toUser(userDto);
         userService.saveUser(user);
         return UserMapper.toUserDto(userService.saveUser(user));
