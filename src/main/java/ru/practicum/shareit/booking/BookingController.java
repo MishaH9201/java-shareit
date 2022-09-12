@@ -30,7 +30,7 @@ public class BookingController {
     @PatchMapping("/{bookingId}")
     public BookingDtoForUpdate update(@RequestHeader(ConstantsProject.USER_ID) Long userId,
                                       @PathVariable long bookingId,
-                                      @RequestParam(value = "approved") boolean approved) {
+                                      @RequestParam boolean approved) {
         Booking booking = bookingService.update(userId, bookingId, approved);
         return BookingMapper.toBookingDtoForUpdate(booking);
     }

@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByBookerId(Long userId);
 
-    List<Booking> findByBooker_IdAndStatus(Long bookerId, BookingStatus status);
+    List<Booking> findByBookerIdAndStatus(Long bookerId, BookingStatus status);
 
     @Query("select b from Booking b " +
             " where b.booker.id = ?1 and b.end > current_timestamp " +

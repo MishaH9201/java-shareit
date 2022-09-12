@@ -35,11 +35,13 @@ public class BookingServiceImpl implements BookingService {
         Item item = itemRepository.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
         if (user.equals(item.getOwner())) {
+            log.info("User {} can't pick up your item",userId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You can't pick up your item");
         }
         LocalDateTime start = bookingDto.getStart();
         LocalDateTime end = bookingDto.getEnd();
         if (end.isBefore(start)) {
+            log.info("Time error");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Time error");
         }
         if (!item.getAvailable()) {
@@ -61,6 +63,7 @@ public class BookingServiceImpl implements BookingService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Only the owner can confirm");
         }
         if (booking.getStatus() == BookingStatus.APPROVED || booking.getStatus() == BookingStatus.REJECTED) {
+            log.info("Status cannot be changed");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "\n" +
                     "Status cannot be changed");
         }
@@ -79,6 +82,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found")));
         log.info("Get booking");
         if (userId != bookingDto.getItem().getOwner().getId() && userId != bookingDto.getBooker().getId()) {
+            log.info("User {} can't get booking",userId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User can't get booking");
         }
         return bookingDto;
@@ -91,10 +95,7 @@ public class BookingServiceImpl implements BookingService {
         List<Booking> bookings;
         switch (state) {
             case "ALL":
-                bookings = repository.findByBookerId(userId)
-                        .stream()
-                        .sorted((o1, o2) -> o2.getStart().compareTo(o1.getStart()))
-                        .collect(Collectors.toList());
+                bookings = findByBookerId(userId);
                 break;
             case "CURRENT":
                 bookings = repository.findCorrentBookingsByBookerId(userId);
@@ -106,15 +107,15 @@ public class BookingServiceImpl implements BookingService {
                 bookings = repository.findUpcomingBookingsByBookerId(userId);
                 break;
             case "WAITING":
-                bookings = repository.findByBooker_IdAndStatus(userId, BookingStatus.WAITING);
+                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.WAITING);
                 break;
             case "REJECTED":
-                bookings = repository.findByBooker_IdAndStatus(userId, BookingStatus.REJECTED);
+                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.REJECTED);
                 break;
             default:
                 throw new BedRequestException("Unknown state: " + state);
         }
-        log.info("Get booking by user");
+        log.info("Get booking by userId " + userId);
         return bookings
                 .stream()
                 .map(BookingMapper::toBookingDtoForUpdate)
@@ -151,6 +152,13 @@ public class BookingServiceImpl implements BookingService {
         return bookings
                 .stream()
                 .map(BookingMapper::toBookingDtoForUpdate)
+                .collect(Collectors.toList());
+    }
+
+    private List<Booking> findByBookerId(Long userId) {
+        return repository.findByBookerId(userId)
+                .stream()
+                .sorted((o1, o2) -> o2.getStart().compareTo(o1.getStart()))
                 .collect(Collectors.toList());
     }
 }

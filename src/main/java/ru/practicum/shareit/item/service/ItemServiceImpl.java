@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.dto.BookingDtoShort;
+import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -39,14 +39,12 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDtoForComments> getItems(long userId) {
         List<Item> items = repository.findByOwnerIdOrderById(userId);
-        List<ItemDtoForComments> itemDtoList = new ArrayList<>();
-        for (Item i : items) {
-            List<CommentDto> comments = commentRepository.findByItemId(i.getId())
-                    .stream()
-                    .map(CommentMapper::toCommentDto)
-                    .collect(Collectors.toList());
-            itemDtoList.add(ItemMapper.toItemDtoForComments(i, comments, checkLastBooking(i.getId(), userId), checkNextBooking(i.getId(), userId)));
-        }
+        List<ItemDtoForComments> itemDtoList = items.stream()
+                .map(o -> ItemMapper.toItemDtoForComments(o,
+                        addComments(o.getId()),
+                        checkLastBooking(o.getId(), userId),
+                        checkNextBooking(o.getId(), userId)))
+                .collect(Collectors.toList());
         log.info("Get Items");
         return itemDtoList;
     }
@@ -55,10 +53,7 @@ public class ItemServiceImpl implements ItemService {
     public ItemDtoForComments getItemById(Long userId, Long itemId) {
         BookingDtoShort nextBooking = checkNextBooking(itemId, userId);
         BookingDtoShort lastBooking = checkLastBooking(itemId, userId);
-        List<CommentDto> comments = commentRepository.findByItemId(itemId)
-                .stream()
-                .map(CommentMapper::toCommentDto)
-                .collect(Collectors.toList());
+        List<CommentDto> comments = addComments(itemId);
         log.info("Get Item by id");
         Item item = repository.findById(itemId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
@@ -87,7 +82,7 @@ public class ItemServiceImpl implements ItemService {
         Item itemUpdate = repository.findById(item.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
         if (userId != itemUpdate.getOwner().getId()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Item belongs to another user");
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, ("Item belongs to another user"));
         }
         if (item.getName() != null) {
             itemUpdate.setName(item.getName());
@@ -145,5 +140,12 @@ public class ItemServiceImpl implements ItemService {
         } else {
             return BookingMapper.toBookingDtoShort(lastBooking);
         }
+    }
+
+    private List<CommentDto> addComments(Long itemId) {
+        return commentRepository.findByItemId(itemId)
+                .stream()
+                .map(CommentMapper::toCommentDto)
+                .collect(Collectors.toList());
     }
 }
