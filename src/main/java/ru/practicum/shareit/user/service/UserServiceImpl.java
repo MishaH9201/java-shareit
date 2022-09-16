@@ -2,8 +2,10 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.UserMapper;
+import org.springframework.web.server.ResponseStatusException;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -35,19 +37,29 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(Long id, User user) {
+        User userUpdate = repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        if (user.getEmail() != null) {
+            userUpdate.setEmail(user.getEmail());
+        }
+        if (user.getName() != null) {
+            userUpdate.setName(user.getName());
+        }
+        repository.save(userUpdate);
         log.info("Update user");
-        return repository.update(id, user);
+        return userUpdate;
     }
 
     @Override
     public User getUserById(Long id) {
         log.info("Get user");
-        return repository.getUserById(id);
+        return repository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
     }
 
     @Override
     public void deleteUser(Long id) {
         log.info("Delete user");
-        repository.deleteUser(id);
+        repository.deleteById(id);
     }
 }
