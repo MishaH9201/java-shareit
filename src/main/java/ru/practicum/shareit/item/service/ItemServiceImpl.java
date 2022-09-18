@@ -2,6 +2,8 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -18,6 +20,8 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.requests.model.ItemRequest;
+import ru.practicum.shareit.requests.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
@@ -35,10 +39,11 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
+    private final ItemRequestRepository itemRequestRepository;
 
     @Override
-    public List<ItemDtoForComments> getItems(long userId) {
-        List<Item> items = repository.findByOwnerIdOrderById(userId);
+    public List<ItemDtoForComments> getItems(long userId, PageRequest pageRequest) {
+        Page<Item> items = repository.findByOwnerIdOrderById(userId, pageRequest);
         List<ItemDtoForComments> itemDtoList = items.stream()
                 .map(o -> ItemMapper.toItemDtoForComments(o,
                         addComments(o.getId()),
@@ -65,6 +70,11 @@ public class ItemServiceImpl implements ItemService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         Item item = ItemMapper.toItem(itemDto, user);
+        if(itemDto.getRequestId()!=null) {
+            itemRequestRepository.findById(itemDto.getRequestId()).ifPresent(item::setRequest);
+        }
+        // item.setRequest(itemRequestRepository.findById(itemDto.getRequestId())
+        //        .orElse(null));
         log.info("Add new Item");
         return repository.save(item);
     }
@@ -93,16 +103,19 @@ public class ItemServiceImpl implements ItemService {
         if (item.getAvailable() != null) {
             itemUpdate.setAvailable(item.getAvailable());
         }
+        if(item.getRequestId() != null) {
+            itemUpdate.setRequest(itemRequestRepository.findById(item.getRequestId()).orElse(null));
+        }
         log.info("Update Items");
         return repository.save(itemUpdate);
     }
 
     @Override
-    public List<ItemDto> search(String text) {
+    public List<ItemDto> search(String text,PageRequest pageRequest) {
         if (text.isBlank()) {
             return new ArrayList<>();
         } else {
-            return repository.search(text)
+            return repository.search(text, pageRequest)
                     .stream()
                     .map(ItemMapper::toItemDto)
                     .collect(Collectors.toList());

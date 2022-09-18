@@ -2,6 +2,8 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -89,28 +91,28 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<BookingDtoForUpdate> findAllBookingsByUserId(Long userId, String state) {
+    public List<BookingDtoForUpdate> findAllBookingsByUserId(Long userId, String state, PageRequest pageRequest) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        List<Booking> bookings;
+        Page<Booking> bookings;
         switch (state) {
             case "ALL":
-                bookings = findByBookerId(userId);
+                bookings =repository.findAllByBookerId(userId,pageRequest); //findByBookerId(userId, pageRequest);
                 break;
             case "CURRENT":
-                bookings = repository.findCorrentBookingsByBookerId(userId);
+                bookings = repository.findCorrentBookingsByBookerId(userId,pageRequest);
                 break;
             case "PAST":
-                bookings = repository.findPastBookingsByBookerId(userId);
+                bookings = repository.findPastBookingsByBookerId(userId,pageRequest);
                 break;
             case "FUTURE":
-                bookings = repository.findUpcomingBookingsByBookerId(userId);
+                bookings = repository.findUpcomingBookingsByBookerId(userId,pageRequest);
                 break;
             case "WAITING":
-                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.WAITING);
+                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.WAITING,pageRequest);
                 break;
             case "REJECTED":
-                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.REJECTED);
+                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.REJECTED,pageRequest);
                 break;
             default:
                 throw new BedRequestException("Unknown state: " + state);
@@ -121,29 +123,29 @@ public class BookingServiceImpl implements BookingService {
                 .map(BookingMapper::toBookingDtoForUpdate)
                 .collect(Collectors.toList());
     }
-
-    public List<BookingDtoForUpdate> findAllBookingsForItemsUser(Long userId, String state) {
+@Override
+    public List<BookingDtoForUpdate> findAllBookingsForItemsUser(Long userId, String state,PageRequest pageRequest) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
-        List<Booking> bookings;
+        Page<Booking> bookings;
         switch (state) {
             case "ALL":
-                bookings = repository.findBookingsItemsUser(userId);
+                bookings = repository.findBookingsItemsUser(userId,pageRequest);
                 break;
             case "CURRENT":
-                bookings = repository.findCurrentBookingsItemsUser(userId);
+                bookings = repository.findCurrentBookingsItemsUser(userId,pageRequest);
                 break;
             case "PAST":
-                bookings = repository.findPastBookingsItemsUser(userId);
+                bookings = repository.findPastBookingsItemsUser(userId,pageRequest);
                 break;
             case "FUTURE":
-                bookings = repository.findUpcomingBookingsItemsUser(userId);
+                bookings = repository.findUpcomingBookingsItemsUser(userId,pageRequest);
                 break;
             case "WAITING":
-                bookings = repository.findByItemOwnerIdAndStatusWaiting(userId, BookingStatus.WAITING);
+                bookings = repository.findByItemOwnerIdAndStatusWaiting(userId, BookingStatus.WAITING, pageRequest);
                 break;
             case "REJECTED":
-                bookings = repository.findByItemOwnerIdAndStatusRejected(userId, BookingStatus.REJECTED);
+                bookings = repository.findByItemOwnerIdAndStatusRejected(userId, BookingStatus.REJECTED, pageRequest);
                 break;
             default:
                 throw new BedRequestException("Unknown state: " + state);
@@ -155,7 +157,7 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
-    private List<Booking> findByBookerId(Long userId) {
+    private List<Booking> findByBookerId(Long userId, PageRequest pageRequest) {
         return repository.findByBookerId(userId)
                 .stream()
                 .sorted((o1, o2) -> o2.getStart().compareTo(o1.getStart()))

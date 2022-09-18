@@ -1,17 +1,76 @@
 package ru.practicum.shareit.booking.repository;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.booking.model.BookingStatus;
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.annotation.DirtiesContext;
 
-import java.util.List;
-import java.util.Optional;
+import static org.junit.jupiter.api.Assertions.*;
+@DataJpaTest
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+class BookingRepositoryTest {
 
-public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findByBookerId(Long userId);
+    @Test
+    void findByBookerId() {
+    }
+
+    @Test
+    void findAllByBookerId() {
+    }
+
+    @Test
+    void findByBookerIdAndStatus() {
+    }
+
+    @Test
+    void findCorrentBookingsByBookerId() {
+    }
+
+    @Test
+    void findUpcomingBookingsByBookerId() {
+    }
+
+    @Test
+    void findPastBookingsByBookerId() {
+    }
+
+    @Test
+    void findBookingsItemsUser() {
+    }
+
+    @Test
+    void findUpcomingBookingsItemsUser() {
+    }
+
+    @Test
+    void findCurrentBookingsItemsUser() {
+    }
+
+    @Test
+    void findPastBookingsItemsUser() {
+    }
+
+    @Test
+    void getTopByItem_IdAndBooker_IdOrderByEndAsc() {
+    }
+
+    @Test
+    void findByItemOwnerIdAndStatusWaiting() {
+    }
+
+    @Test
+    void findByItemOwnerIdAndStatusRejected() {
+    }
+
+    @Test
+    void findLastBookingWithItemAndOwner() {
+    }
+
+    @Test
+    void findNextBookingWithItemAndOwner() {
+    }
+}
+/*
+ List<Booking> findByBookerId(Long userId);
 
     Page<Booking> findAllByBookerId(Long userId, PageRequest pageRequest);
 
@@ -86,4 +145,4 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             "ORDER BY b.start ASC ")
     Optional<Booking> findNextBookingWithItemAndOwner(Long itemId, Long ownerId);
 }
-
+ */
