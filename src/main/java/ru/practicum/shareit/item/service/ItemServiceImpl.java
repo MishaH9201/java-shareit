@@ -73,8 +73,7 @@ public class ItemServiceImpl implements ItemService {
         if(itemDto.getRequestId()!=null) {
             itemRequestRepository.findById(itemDto.getRequestId()).ifPresent(item::setRequest);
         }
-        // item.setRequest(itemRequestRepository.findById(itemDto.getRequestId())
-        //        .orElse(null));
+
         log.info("Add new Item");
         return repository.save(item);
     }
