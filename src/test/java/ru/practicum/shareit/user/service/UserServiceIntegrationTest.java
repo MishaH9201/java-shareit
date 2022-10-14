@@ -23,16 +23,17 @@ import static org.hamcrest.Matchers.equalTo;
 public class UserServiceIntegrationTest {
     private final EntityManager em;
     private final UserService userService;
-@Test
-    void getAllUsers(){
-    User user1 = userService.saveUser(new User(1L,"a@a.ru","Ed"));
-    User user2 = userService.saveUser(new User(2L,"b@a.ru","Edy"));
-    TypedQuery<User> query = em.createQuery("Select u from User u", User.class);
-    List<User> usersTest = query.getResultList();
-    assertThat(usersTest.size(), equalTo(2));
-    assertThat(usersTest.get(0).getEmail(), equalTo(user1.getEmail()));
-    assertThat(usersTest.get(0).getName(), equalTo(user1.getName()));
-    assertThat(usersTest.get(1).getEmail(), equalTo(user2.getEmail()));
-    assertThat(usersTest.get(1).getName(), equalTo(user2.getName()));
-}
+
+    @Test
+    void getAllUsers() {
+        User user1 = userService.saveUser(new User(1L, "a@a.ru", "Ed"));
+        User user2 = userService.saveUser(new User(2L, "b@a.ru", "Edy"));
+        TypedQuery<User> query = em.createQuery("Select u from User u", User.class);
+        List<User> usersTest = query.getResultList();
+        assertThat(usersTest.size(), equalTo(2));
+        assertThat(usersTest.get(0).getEmail(), equalTo(user1.getEmail()));
+        assertThat(usersTest.get(0).getName(), equalTo(user1.getName()));
+        assertThat(usersTest.get(1).getEmail(), equalTo(user2.getEmail()));
+        assertThat(usersTest.get(1).getName(), equalTo(user2.getName()));
+    }
 }

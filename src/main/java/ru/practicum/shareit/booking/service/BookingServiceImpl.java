@@ -49,8 +49,7 @@ public class BookingServiceImpl implements BookingService {
         if (!item.getAvailable()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Booking not possible");
         }
-        bookingDto.setBooker(user);
-        Booking booking = BookingMapper.toBooking(bookingDto);
+        Booking booking = BookingMapper.toBooking(bookingDto,user);
         booking.setItem(item);
         booking.setStatus(BookingStatus.WAITING);
         log.info("Add new Booking");

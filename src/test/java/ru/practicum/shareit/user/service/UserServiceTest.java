@@ -23,10 +23,10 @@ class UserServiceTest {
     User user1;
 
     @BeforeEach
-    void beforeEach(){
-        user1= new User(1L, "email1@email.com", "Эдуард");
-        userRepository=mock(UserRepository.class);
-        userService=new UserServiceImpl(userRepository);
+    void beforeEach() {
+        user1 = new User(1L, "email1@email.com", "Эдуард");
+        userRepository = mock(UserRepository.class);
+        userService = new UserServiceImpl(userRepository);
     }
 
     @Test

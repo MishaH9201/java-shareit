@@ -8,7 +8,7 @@ import ru.practicum.shareit.user.model.User;
 import java.util.List;
 
 public class ItemRequestMapper {
-    public static ItemRequest toItemRequest(ItemRequestDto itemRequestDto, User user){
+    public static ItemRequest toItemRequest(ItemRequestDto itemRequestDto, User user) {
         return  ItemRequest.builder()
                 .id(itemRequestDto.getId())
                 .description(itemRequestDto.getDescription())
@@ -16,7 +16,8 @@ public class ItemRequestMapper {
                 .created(itemRequestDto.getCreated())
                 .build();
     }
-    public static ItemRequestDto toItemRequestDto(ItemRequest itemRequest, List<ItemDto> items){
+
+    public static ItemRequestDto toItemRequestDto(ItemRequest itemRequest, List<ItemDto> items) {
         return  ItemRequestDto.builder()
                 .id(itemRequest.getId())
                 .description(itemRequest.getDescription())

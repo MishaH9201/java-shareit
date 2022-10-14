@@ -40,7 +40,7 @@ class BookingServiceTest {
         user1 = new User(1L, "email1@email.com", "Эдуард");
         user2 = new User(2L, "email2@email.com", "Станислав");
         user3 = new User(3L, "email3@email.com", "Растислав");
-        item1 = new Item(1l, "Ручка", "Писательный инструмент", true, user1, null);
+        item1 = new Item(1L, "Ручка", "Писательный инструмент", true, user1, null);
         userRepository = mock(UserRepository.class);
         itemRepository = mock(ItemRepository.class);
         bookingRepository = mock(BookingRepository.class);

@@ -32,19 +32,19 @@ class ItemRequestControllerTest {
     MockMvc mockMvc;
     @Autowired
     ObjectMapper mapper;
-    public final String USER_ID = "X-Sharer-User-Id";
+    public final String userId = "X-Sharer-User-Id";
     ItemRequestDto itemRequestDto;
 
     @BeforeEach
     void beforeEach() {
-        itemRequestDto = new ItemRequestDto(1l, "Что-то пишушее", LocalDateTime.now(), 1L, Collections.emptyList());
+        itemRequestDto = new ItemRequestDto(1L, "Что-то пишушее", LocalDateTime.now(), 1L, Collections.emptyList());
     }
 
     @Test
     void get() throws Exception {
         when(itemRequestService.getItemRequests(anyLong())).thenReturn(Collections.emptyList());
         mockMvc.perform(MockMvcRequestBuilders.get("/requests")
-                        .header(USER_ID, 1L))
+                        .header(userId, 1L))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
         verify(itemRequestService, times(1)).getItemRequests(anyLong());
@@ -54,7 +54,7 @@ class ItemRequestControllerTest {
     void getAll() throws Exception {
         when(itemRequestService.getAllItemsRequests(anyLong(), any())).thenReturn(Collections.emptyList());
         mockMvc.perform(MockMvcRequestBuilders.get("/requests/all?from={from}&size={size}", 1, 10)
-                        .header(USER_ID, 1L))
+                        .header(userId, 1L))
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
         verify(itemRequestService, times(1)).getAllItemsRequests(anyLong(), any());
@@ -64,7 +64,7 @@ class ItemRequestControllerTest {
     void getById() throws Exception {
         when(itemRequestService.getItemRequestsById(anyLong(), anyLong())).thenReturn(itemRequestDto);
         mockMvc.perform(MockMvcRequestBuilders.get("/requests/{requestId}", 1L)
-                        .header(USER_ID, 1L))
+                        .header(userId, 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description", is(itemRequestDto.getDescription())));
         verify(itemRequestService, times(1)).getItemRequestsById(anyLong(), anyLong());
@@ -74,7 +74,7 @@ class ItemRequestControllerTest {
     void add() throws Exception {
         when(itemRequestService.addNewItemRequest(any(), anyLong())).thenReturn(itemRequestDto);
         mockMvc.perform(post("/requests")
-                        .header(USER_ID, 1L)
+                        .header(userId, 1L)
                         .content(mapper.writeValueAsString(itemRequestDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)

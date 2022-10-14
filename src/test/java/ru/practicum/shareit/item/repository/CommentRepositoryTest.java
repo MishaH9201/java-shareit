@@ -21,8 +21,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @DataJpaTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CommentRepositoryTest {
-@Autowired
-CommentRepository commentRepository;
+    @Autowired
+    CommentRepository commentRepository;
     @Autowired
     ItemRepository itemRepository;
     @Autowired
@@ -33,15 +33,15 @@ CommentRepository commentRepository;
 
     @BeforeEach
     void beforeEach() {
-        user1= new User(1L, "email1@email.com", "Эдуард");
-        user2= new User(2L, "email2@email.com", "Станислав");
+        user1 = new User(1L, "email1@email.com", "Эдуард");
+        user2 = new User(2L, "email2@email.com", "Станислав");
         userRepository.save(user1);
         userRepository.save(user2);
-        item1=new Item(1l, "Ручка", "Писательный инструмент",true, user1,null);
-        item2=new Item(2l, "Кошка", "Мяукательный инструмент",true, user2,null);
+        item1 = new Item(1L, "Ручка", "Писательный инструмент", true, user1, null);
+        item2 = new Item(2L, "Кошка", "Мяукательный инструмент", true, user2, null);
         itemRepository.save(item1);
         itemRepository.save(item2);
-        comment=new Comment(1L,"Отличная ручка",item1,user2,LocalDateTime.now());
+        comment = new Comment(1L, "Отличная ручка", item1, user2, LocalDateTime.now());
         commentRepository.save(comment);
     }
 
@@ -51,9 +51,10 @@ CommentRepository commentRepository;
         itemRepository.deleteAll();
         commentRepository.deleteAll();
     }
+
     @Test
-  void findByItemId(){
-     List<Comment> comments =  commentRepository.findByItemId(1L);
+    void findByItemId() {
+        List<Comment> comments = commentRepository.findByItemId(1L);
         assertNotNull(comments);
         assertEquals(1L, comments.get(0).getId());
         assertEquals("Отличная ручка", comments.get(0).getText());

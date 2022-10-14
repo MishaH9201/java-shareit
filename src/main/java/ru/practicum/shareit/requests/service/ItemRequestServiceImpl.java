@@ -63,7 +63,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         return repository.findAll(pageRequest)
                 .stream()
                 .map(o -> ItemRequestMapper.toItemRequestDto(o, addItemsForRequest(o.getId())))
-                .filter(o ->!o.getRequestor().equals(userId))
+                .filter(o -> !o.getRequestor().equals(userId))
                 .collect(Collectors.toList());
     }
 

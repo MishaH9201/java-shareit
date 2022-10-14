@@ -11,7 +11,6 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collector;
 
 @Builder
 @NoArgsConstructor
@@ -22,7 +21,7 @@ public class ItemRequestDto {
     @NotBlank
     @NotNull
     private String description;
-    private LocalDateTime created=LocalDateTime.now();
+    private LocalDateTime created = LocalDateTime.now();
     private Long requestor;
     private List<ItemDto> items;
 

@@ -3,7 +3,7 @@ package ru.practicum.shareit.booking.dto;
 
 import lombok.*;
 import ru.practicum.shareit.booking.model.BookingStatus;
-import ru.practicum.shareit.user.model.User;
+
 
 
 import javax.validation.constraints.FutureOrPresent;
@@ -21,6 +21,6 @@ public class BookingDto {
     @FutureOrPresent
     private LocalDateTime end;
     private Long itemId;
-    private User booker;
+    private Long bookerId;
     private BookingStatus status;
 }

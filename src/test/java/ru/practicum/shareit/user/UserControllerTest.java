@@ -14,6 +14,7 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
@@ -22,7 +23,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 
 
 @WebMvcTest(UserController.class)
@@ -38,13 +38,13 @@ class UserControllerTest {
     User user;
 
     @BeforeEach
-    void beforeEach(){
-        userDto=new UserDto(1L, "email1@email.com", "Эдуард");
-        user=new User(1L, "email1@email.com", "Эдуард");
+    void beforeEach() {
+        userDto = new UserDto(1L, "email1@email.com", "Эдуард");
+        user = new User(1L, "email1@email.com", "Эдуард");
     }
 
     @Test
-    void getAllUsers() throws Exception{
+    void getAllUsers() throws Exception {
         when(userService.getAllUsers()).thenReturn(Collections.emptyList());
         mockMvc.perform(MockMvcRequestBuilders.get("/users"))
                 .andExpect(status().isOk())
@@ -64,7 +64,7 @@ class UserControllerTest {
     }
 
     @Test
-    void saveNewUser() throws Exception{
+    void saveNewUser() throws Exception {
         when(userService.saveUser(any())).thenReturn(user);
         mockMvc.perform(post("/users")
                         .content(mapper.writeValueAsString(userDto))
@@ -83,7 +83,7 @@ class UserControllerTest {
     void updateUser() throws Exception {
         when(userService.updateUser(any(), any()))
                 .thenReturn(user);
-        mockMvc.perform(patch("/users/{userId}" , 1L)
+        mockMvc.perform(patch("/users/{userId}", 1L)
                         .content(mapper.writeValueAsString(userDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -92,7 +92,7 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
                 .andExpect(jsonPath("$.name", is(userDto.getName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
-        verify(userService, times(1)).updateUser(any(),any());
+        verify(userService, times(1)).updateUser(any(), any());
     }
 
     @Test

@@ -51,14 +51,13 @@ class ItemServiceTest {
         user2 = new User(2L, "email2@email.com", "Станислав");
         user3 = new User(3L, "email3@email.com", "Растислав");
         itemRequest = new ItemRequest(1L, "Что-то пишущее", user2, LocalDateTime.now());
-        item1 = new Item(1l, "Ручка", "Писательный инструмент", true, user1, itemRequest);
+        item1 = new Item(1L, "Ручка", "Писательный инструмент", true, user1, itemRequest);
         userRepository = mock(UserRepository.class);
         itemRepository = mock(ItemRepository.class);
         bookingRepository = mock(BookingRepository.class);
         commentRepository = mock(CommentRepository.class);
         itemRequestRepository = mock(ItemRequestRepository.class);
-        itemService = new ItemServiceImpl
-                (itemRepository, userRepository, bookingRepository, commentRepository, itemRequestRepository);
+        itemService = new ItemServiceImpl(itemRepository, userRepository, bookingRepository, commentRepository, itemRequestRepository);
         lastBooking = Booking
                 .builder()
                 .id(1L)
@@ -136,7 +135,7 @@ class ItemServiceTest {
 
     @Test
     void updateItem() {
-        Item itemUpdate = new Item(1l, "Карандаш", "Писательный инструмент", true, user1, itemRequest);
+        Item itemUpdate = new Item(1L, "Карандаш", "Писательный инструмент", true, user1, itemRequest);
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user1));
         when(itemRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(item1));
         when(itemRepository.save(Mockito.any())).thenReturn(itemUpdate);
@@ -162,9 +161,9 @@ class ItemServiceTest {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user1));
         when(itemRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(item1));
         when(commentRepository.save(Mockito.any())).thenReturn(comment);
-        when(bookingRepository.getTopByItem_IdAndBooker_IdOrderByEndAsc(Mockito.anyLong(),Mockito.anyLong()))
+        when(bookingRepository.getTopByItem_IdAndBooker_IdOrderByEndAsc(Mockito.anyLong(), Mockito.anyLong()))
                 .thenReturn(Optional.ofNullable(lastBooking));
-        CommentDto commentTest=itemService.createComment(CommentMapper.toCommentDto(comment),user3.getId(),item1.getId());
+        CommentDto commentTest = itemService.createComment(CommentMapper.toCommentDto(comment), user3.getId(), item1.getId());
         assertEquals("Отличная ручка", commentTest.getText());
         assertEquals(1L, commentTest.getId());
         Mockito.verify(commentRepository, times(1)).save(Mockito.any());

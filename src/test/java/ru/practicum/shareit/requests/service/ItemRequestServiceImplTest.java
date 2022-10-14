@@ -39,20 +39,20 @@ class ItemRequestServiceImplTest {
         user1 = new User(1L, "email1@email.com", "Эдуард");
         user2 = new User(2L, "email2@email.com", "Станислав");
         itemRequest = new ItemRequest(1L, "Что-то пишущее", user2, LocalDateTime.now());
-        item1 = new Item(1l, "Ручка", "Писательный инструмент", true, user1, null);
+        item1 = new Item(1L, "Ручка", "Писательный инструмент", true, user1, null);
         userRepository = mock(UserRepository.class);
         itemRepository = mock(ItemRepository.class);
         itemRequestRepository = mock(ItemRequestRepository.class);
-        itemRequestService = new ItemRequestServiceImpl(itemRequestRepository,userRepository,itemRepository);
+        itemRequestService = new ItemRequestServiceImpl(itemRequestRepository, userRepository, itemRepository);
     }
 
     @Test
     void addNewItemRequest() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user2));
         when(itemRequestRepository.save(Mockito.any())).thenReturn(itemRequest);
-        ItemDto itemDto= ItemMapper.toItemDto(item1);
-        ItemRequestDto itemRequestTest = itemRequestService.addNewItemRequest
-                (ItemRequestMapper.toItemRequestDto(itemRequest, Collections.singletonList(itemDto)), user2.getId());
+        ItemDto itemDto = ItemMapper.toItemDto(item1);
+        ItemRequestDto itemRequestTest = itemRequestService.addNewItemRequest(
+                ItemRequestMapper.toItemRequestDto(itemRequest, Collections.singletonList(itemDto)), user2.getId());
         assertEquals(1L, itemRequestTest.getId());
         assertEquals("Что-то пишущее", itemRequestTest.getDescription());
         Mockito.verify(itemRequestRepository, times(1)).save(Mockito.any());
@@ -63,7 +63,7 @@ class ItemRequestServiceImplTest {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user2));
         when(itemRepository.findByRequestId(Mockito.anyLong())).thenReturn(Collections.singletonList(item1));
         when(itemRequestRepository.findByRequestorId(Mockito.any())).thenReturn(Collections.singletonList(itemRequest));
-        List<ItemRequestDto> itemRequestsTest= itemRequestService.getItemRequests(user2.getId());
+        List<ItemRequestDto> itemRequestsTest = itemRequestService.getItemRequests(user2.getId());
         assertEquals(1L, itemRequestsTest.get(0).getId());
         assertEquals("Что-то пишущее", itemRequestsTest.get(0).getDescription());
         Mockito.verify(itemRequestRepository, times(1)).findByRequestorId(Mockito.any());
@@ -74,7 +74,7 @@ class ItemRequestServiceImplTest {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user2));
         when(itemRepository.findByRequestId(Mockito.anyLong())).thenReturn(Collections.singletonList(item1));
         when(itemRequestRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(itemRequest));
-        ItemRequestDto itemRequestTest= itemRequestService.getItemRequestsById(user2.getId(), itemRequest.getId());
+        ItemRequestDto itemRequestTest = itemRequestService.getItemRequestsById(user2.getId(), itemRequest.getId());
         assertEquals(1L, itemRequestTest.getId());
         assertEquals("Что-то пишущее", itemRequestTest.getDescription());
         Mockito.verify(itemRequestRepository, times(1)).findById(Mockito.any());
@@ -86,7 +86,7 @@ class ItemRequestServiceImplTest {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user2));
         when(itemRepository.findByRequestId(Mockito.anyLong())).thenReturn(Collections.singletonList(item1));
         when(itemRequestRepository.findAll(pageRequest)).thenReturn(new PageImpl<>(List.of(itemRequest)));
-        List<ItemRequestDto> itemRequestsTest= itemRequestService.getAllItemsRequests(user1.getId(),pageRequest);
+        List<ItemRequestDto> itemRequestsTest = itemRequestService.getAllItemsRequests(user1.getId(), pageRequest);
         assertEquals(1L, itemRequestsTest.get(0).getId());
         assertEquals("Что-то пишущее", itemRequestsTest.get(0).getDescription());
         Mockito.verify(itemRequestRepository, times(1)).findAll(pageRequest);

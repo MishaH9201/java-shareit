@@ -26,10 +26,10 @@ public class BookingController {
     private final BookingService bookingService;
 
     @PostMapping
-    public BookingDto add(@Valid @RequestHeader(ConstantsProject.USER_ID) Long userId,
+    public BookingDtoForUpdate add(@Valid @RequestHeader(ConstantsProject.USER_ID) Long userId,
                           @Valid @RequestBody BookingDto bookingDto) {
         Booking booking = bookingService.save(bookingDto, userId);
-        return BookingMapper.toBookingDto(booking);
+        return BookingMapper.toBookingDtoForUpdate(booking);
     }
 
 
