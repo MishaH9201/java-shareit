@@ -48,24 +48,24 @@ public class BookingController {
     }
 
     @GetMapping
-    public List<BookingDtoForUpdate> findAllBookingsByUserId
-            (@RequestHeader(ConstantsProject.USER_ID) Long userId,
+    public List<BookingDtoForUpdate> findAllBookingsByUserId(
+            @RequestHeader(ConstantsProject.USER_ID) Long userId,
              @RequestParam(required = false, defaultValue = "ALL") String state,
              @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
              @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         int page = from / size;
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by("start").descending());
-        return bookingService.findAllBookingsByUserId(userId, state,pageRequest);
+        return bookingService.findAllBookingsByUserId(userId, state, pageRequest);
     }
 
     @GetMapping("/owner")
-    public List<BookingDtoForUpdate> findAllBookingsForItemsUser
-            (@RequestHeader(ConstantsProject.USER_ID) Long userId,
+    public List<BookingDtoForUpdate> findAllBookingsForItemsUser(
+            @RequestHeader(ConstantsProject.USER_ID) Long userId,
              @RequestParam(required = false, defaultValue = "ALL") String state,
              @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
              @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         int page = from / size;
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by("start").descending());
-        return bookingService.findAllBookingsForItemsUser(userId, state,pageRequest);
+        return bookingService.findAllBookingsForItemsUser(userId, state, pageRequest);
     }
 }

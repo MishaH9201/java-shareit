@@ -30,7 +30,7 @@ public class ItemController {
                                         @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         int page = from / size;
         final PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
-        return itemService.getItems(userId,pageRequest);
+        return itemService.getItems(userId, pageRequest);
     }
 
     @GetMapping("/{itemId}")
@@ -42,7 +42,7 @@ public class ItemController {
     @PostMapping
     public ItemDto add(@Valid @RequestHeader(ConstantsProject.USER_ID) Long userId,
                        @Valid @RequestBody ItemDto itemDto) {
-        Item item=itemService.addNewItem(itemDto, userId);
+        Item item = itemService.addNewItem(itemDto, userId);
         return ItemMapper.toItemDto(item);
     }
 
@@ -57,7 +57,6 @@ public class ItemController {
                           @PathVariable long itemId,
                           @RequestBody ItemDto itemDto) {
         itemDto.setId(itemId);
-        itemService.updateItem(userId, itemDto);
         return ItemMapper.toItemDto(itemService.updateItem(userId, itemDto));
     }
 

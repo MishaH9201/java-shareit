@@ -20,7 +20,6 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.requests.model.ItemRequest;
 import ru.practicum.shareit.requests.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -70,10 +69,9 @@ public class ItemServiceImpl implements ItemService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         Item item = ItemMapper.toItem(itemDto, user);
-        if(itemDto.getRequestId()!=null) {
+        if (itemDto.getRequestId() != null) {
             itemRequestRepository.findById(itemDto.getRequestId()).ifPresent(item::setRequest);
         }
-
         log.info("Add new Item");
         return repository.save(item);
     }
@@ -102,7 +100,7 @@ public class ItemServiceImpl implements ItemService {
         if (item.getAvailable() != null) {
             itemUpdate.setAvailable(item.getAvailable());
         }
-        if(item.getRequestId() != null) {
+        if (item.getRequestId() != null) {
             itemUpdate.setRequest(itemRequestRepository.findById(item.getRequestId()).orElse(null));
         }
         log.info("Update Items");
@@ -110,7 +108,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemDto> search(String text,PageRequest pageRequest) {
+    public List<ItemDto> search(String text, PageRequest pageRequest) {
         if (text.isBlank()) {
             return new ArrayList<>();
         } else {

@@ -37,7 +37,7 @@ public class BookingServiceImpl implements BookingService {
         Item item = itemRepository.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item not found"));
         if (user.equals(item.getOwner())) {
-            log.info("User {} can't pick up your item",userId);
+            log.info("User {} can't pick up your item", userId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "You can't pick up your item");
         }
         LocalDateTime start = bookingDto.getStart();
@@ -84,7 +84,7 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found")));
         log.info("Get booking");
         if (userId != bookingDto.getItem().getOwner().getId() && userId != bookingDto.getBooker().getId()) {
-            log.info("User {} can't get booking",userId);
+            log.info("User {} can't get booking", userId);
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User can't get booking");
         }
         return bookingDto;
@@ -97,22 +97,22 @@ public class BookingServiceImpl implements BookingService {
         Page<Booking> bookings;
         switch (state) {
             case "ALL":
-                bookings =repository.findAllByBookerId(userId,pageRequest); //findByBookerId(userId, pageRequest);
+                bookings = repository.findAllByBookerId(userId, pageRequest);
                 break;
             case "CURRENT":
-                bookings = repository.findCorrentBookingsByBookerId(userId,pageRequest);
+                bookings = repository.findCorrentBookingsByBookerId(userId, pageRequest);
                 break;
             case "PAST":
-                bookings = repository.findPastBookingsByBookerId(userId,pageRequest);
+                bookings = repository.findPastBookingsByBookerId(userId, pageRequest);
                 break;
             case "FUTURE":
-                bookings = repository.findUpcomingBookingsByBookerId(userId,pageRequest);
+                bookings = repository.findUpcomingBookingsByBookerId(userId, pageRequest);
                 break;
             case "WAITING":
-                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.WAITING,pageRequest);
+                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.WAITING, pageRequest);
                 break;
             case "REJECTED":
-                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.REJECTED,pageRequest);
+                bookings = repository.findByBookerIdAndStatus(userId, BookingStatus.REJECTED, pageRequest);
                 break;
             default:
                 throw new BedRequestException("Unknown state: " + state);
@@ -123,23 +123,24 @@ public class BookingServiceImpl implements BookingService {
                 .map(BookingMapper::toBookingDtoForUpdate)
                 .collect(Collectors.toList());
     }
-@Override
-    public List<BookingDtoForUpdate> findAllBookingsForItemsUser(Long userId, String state,PageRequest pageRequest) {
+
+    @Override
+    public List<BookingDtoForUpdate> findAllBookingsForItemsUser(Long userId, String state, PageRequest pageRequest) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         Page<Booking> bookings;
         switch (state) {
             case "ALL":
-                bookings = repository.findBookingsItemsUser(userId,pageRequest);
+                bookings = repository.findBookingsItemsUser(userId, pageRequest);
                 break;
             case "CURRENT":
-                bookings = repository.findCurrentBookingsItemsUser(userId,pageRequest);
+                bookings = repository.findCurrentBookingsItemsUser(userId, pageRequest);
                 break;
             case "PAST":
-                bookings = repository.findPastBookingsItemsUser(userId,pageRequest);
+                bookings = repository.findPastBookingsItemsUser(userId, pageRequest);
                 break;
             case "FUTURE":
-                bookings = repository.findUpcomingBookingsItemsUser(userId,pageRequest);
+                bookings = repository.findUpcomingBookingsItemsUser(userId, pageRequest);
                 break;
             case "WAITING":
                 bookings = repository.findByItemOwnerIdAndStatusWaiting(userId, BookingStatus.WAITING, pageRequest);

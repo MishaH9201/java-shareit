@@ -1,6 +1,6 @@
 package ru.practicum.shareit.user;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,11 +15,12 @@ import ru.practicum.shareit.user.service.UserService;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+
 import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -31,7 +32,8 @@ class UserControllerTest {
     UserService userService;
     @Autowired
     MockMvc mockMvc;
-    ObjectMapper mapper = new ObjectMapper();
+    @Autowired
+    ObjectMapper mapper;
     UserDto userDto;
     User user;
 
@@ -43,17 +45,27 @@ class UserControllerTest {
 
     @Test
     void getAllUsers() throws Exception{
+        when(userService.getAllUsers()).thenReturn(Collections.emptyList());
+        mockMvc.perform(MockMvcRequestBuilders.get("/users"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("[]"));
+        verify(userService, times(1)).getAllUsers();
 
     }
 
     @Test
-    void getUserById() {
+    void getUserById() throws Exception {
+        when(userService.getUserById(any())).thenReturn(user);
+        mockMvc.perform(get("/users/{userId}", 1))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is(userDto.getName())))
+                .andExpect(jsonPath("$.email", is(userDto.getEmail())));
+        verify(userService, times(1)).getUserById(1L);
     }
 
     @Test
     void saveNewUser() throws Exception{
-        when(userService.saveUser(any()))
-                .thenReturn(user);
+        when(userService.saveUser(any())).thenReturn(user);
         mockMvc.perform(post("/users")
                         .content(mapper.writeValueAsString(userDto))
                         .characterEncoding(StandardCharsets.UTF_8)
@@ -63,14 +75,15 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
                 .andExpect(jsonPath("$.name", is(userDto.getName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
-        verify(userService, times(1)).saveUser(user);
+        verify(userService, times(2)).saveUser(any());
     }
+
 
     @Test
     void updateUser() throws Exception {
         when(userService.updateUser(any(), any()))
                 .thenReturn(user);
-        mockMvc.perform(patch("/users/{userId}", 1,Long.class)
+        mockMvc.perform(patch("/users/{userId}" , 1L)
                         .content(mapper.writeValueAsString(userDto))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -79,10 +92,13 @@ class UserControllerTest {
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
                 .andExpect(jsonPath("$.name", is(userDto.getName())))
                 .andExpect(jsonPath("$.email", is(userDto.getEmail())));
-        verify(userService, times(1)).updateUser(1L,user);
+        verify(userService, times(1)).updateUser(any(),any());
     }
 
     @Test
-    void deleteUser() {
+    void deleteUser() throws Exception {
+        mockMvc.perform(delete("/users/{userId}", 1L))
+                .andExpect(status().isOk());
+        verify(userService, times(1)).deleteUser(1L);
     }
 }
