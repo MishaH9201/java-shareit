@@ -71,4 +71,9 @@ class UserServiceTest {
         Mockito.verify(userRepository, times(1)).findById(Mockito.any());
     }
 
+    @Test
+    void deleteUser() {
+        userService.deleteUser(anyLong());
+        Mockito.verify(userRepository, times(1)).deleteById(anyLong());
+    }
 }

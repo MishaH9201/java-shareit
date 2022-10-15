@@ -157,12 +157,6 @@ public class BookingServiceImpl implements BookingService {
                 .collect(Collectors.toList());
     }
 
-    private List<Booking> findByBookerId(Long userId, PageRequest pageRequest) {
-        return repository.findByBookerId(userId)
-                .stream()
-                .sorted((o1, o2) -> o2.getStart().compareTo(o1.getStart()))
-                .collect(Collectors.toList());
-    }
 }
 
 

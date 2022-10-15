@@ -169,4 +169,5 @@ class ItemServiceTest {
         Mockito.verify(commentRepository, times(1)).save(Mockito.any());
         Mockito.verify(itemRepository, times(1)).findById(Mockito.anyLong());
     }
+
 }

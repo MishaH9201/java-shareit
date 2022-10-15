@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.repository;
 
 
 import org.junit.jupiter.api.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 
 
 @DataJpaTest
@@ -45,8 +47,8 @@ class ItemRepositoryTest {
         itemRequest = itemRequestRepository.save(itemRequest);
         item1 = new Item(1L, "Ручка", "Писательный инструмент", true, user1, itemRequest);
         item2 = new Item(2L, "Кошка", "Мяукательный инструмент", true, user2, null);
-        itemRepository.save(item1);
-        itemRepository.save(item2);
+        item1 = itemRepository.save(item1);
+        item2 = itemRepository.save(item2);
     }
 
     @AfterEach

@@ -11,6 +11,7 @@ import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exseption.BedRequestException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
@@ -276,4 +277,13 @@ class BookingServiceTest {
         assertEquals(1L, bookingsTest.get(0).getItem().getId());
         Mockito.verify(bookingRepository, times(1)).findByItemOwnerIdAndStatusRejected(Mockito.anyLong(), Mockito.any(), Mockito.any());
     }
+
+    @Test
+    void shouldTrowsExceptionFindAllBookingsForItemsUserIfStateFail() {
+        when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user2));
+        BedRequestException exception = assertThrows(BedRequestException.class,
+                () -> bookingService.findAllBookingsForItemsUser(1L, "HHH", pageRequest));
+        assertEquals("Unknown state: HHH", exception.getMessage());
+    }
+
 }
