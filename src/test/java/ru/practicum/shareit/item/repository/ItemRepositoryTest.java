@@ -40,9 +40,9 @@ class ItemRepositoryTest {
         user1 = new User(1L, "email1@email.com", "Эдуард");
         user2 = new User(2L, "email2@email.com", "Станислав");
         itemRequest = new ItemRequest(1L, "Что-то пишущее", user2, LocalDateTime.now());
-        userRepository.save(user1);
-        userRepository.save(user2);
-        itemRequestRepository.save(itemRequest);
+        user1 = userRepository.save(user1);
+        user2 = userRepository.save(user2);
+        itemRequest = itemRequestRepository.save(itemRequest);
         item1 = new Item(1L, "Ручка", "Писательный инструмент", true, user1, itemRequest);
         item2 = new Item(2L, "Кошка", "Мяукательный инструмент", true, user2, null);
         itemRepository.save(item1);
