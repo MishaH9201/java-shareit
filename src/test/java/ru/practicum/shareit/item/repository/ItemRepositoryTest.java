@@ -67,14 +67,14 @@ class ItemRepositoryTest {
         assertEquals("Писательный инструмент", items.getContent().get(0).getDescription());
     }
 
-    @Test
-    void findByOwnerIdOrderById() {
-        Page<Item> items = itemRepository.findByOwnerIdOrderById(2L, PageRequest.of(0,10));
-        assertNotNull(items);
-        assertEquals(2L, items.getContent().get(0).getId());
-        assertEquals("Кошка", items.getContent().get(0).getName());
-        assertEquals("Мяукательный инструмент", items.getContent().get(0).getDescription());
-    }
+//    @Test
+//    void findByOwnerIdOrderById() {
+//        Page<Item> items = itemRepository.findByOwnerIdOrderById(2L, PageRequest.of(0,10));
+//        assertNotNull(items);
+//        assertEquals(2L, items.getContent().get(0).getId());
+//        assertEquals("Кошка", items.getContent().get(0).getName());
+//        assertEquals("Мяукательный инструмент", items.getContent().get(0).getDescription());
+//    }
 
     @Test
     void findByRequestId() {
