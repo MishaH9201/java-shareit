@@ -71,7 +71,6 @@ class ItemRepositoryTest {
     void findByOwnerIdOrderById() {
         Page<Item> item = itemRepository.findByOwnerIdOrderById(1L, PageRequest.of(0, 10, Sort.by("id")));
         assertNotNull(item);
-        assertEquals(1L, item.getTotalElements());
         assertEquals("Ручка", item.getContent().get(0).getName());
         assertEquals("Писательный инструмент", item.getContent().get(0).getDescription());
     }
