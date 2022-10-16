@@ -60,20 +60,20 @@ class ItemRepositoryTest {
 
     @Test
     void search() {
-        Page<Item> item = itemRepository.search("пИс", PageRequest.of(0, 10, Sort.by("id")));
-        assertNotNull(item);
-        assertEquals(1L, item.getContent().get(0).getId());
-        assertEquals("Ручка", item.getContent().get(0).getName());
-        assertEquals("Писательный инструмент", item.getContent().get(0).getDescription());
+        Page<Item> items = itemRepository.search("пИс", PageRequest.of(0, 10, Sort.by("id")));
+        assertNotNull(items);
+        assertEquals(1L, items.getContent().get(0).getId());
+        assertEquals("Ручка", items.getContent().get(0).getName());
+        assertEquals("Писательный инструмент", items.getContent().get(0).getDescription());
     }
 
     @Test
     void findByOwnerIdOrderById() {
-        Page<Item> item = itemRepository.findByOwnerIdOrderById(1L, PageRequest.of(0, 10, Sort.by("id")));
-        assertNotNull(item);
-        assertEquals(1L, item.getTotalElements());
-        assertEquals("Ручка", item.getContent().get(0).getName());
-        assertEquals("Писательный инструмент", item.getContent().get(0).getDescription());
+        Page<Item> items = itemRepository.findByOwnerIdOrderById(2L, PageRequest.of(0, 10, Sort.by("id")));
+        assertNotNull(items);
+        assertEquals(2L, items.getContent().get(0).getId());
+        assertEquals("Кошка", items.getContent().get(0).getName());
+        assertEquals("Мяукательный инструмент", items.getContent().get(0).getDescription());
     }
 
     @Test
