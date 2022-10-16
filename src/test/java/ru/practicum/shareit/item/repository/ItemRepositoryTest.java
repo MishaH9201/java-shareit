@@ -69,7 +69,7 @@ class ItemRepositoryTest {
 
     @Test
     void findByOwnerIdOrderById() {
-        Page<Item> items = itemRepository.findByOwnerIdOrderById(2L, PageRequest.of(0, 10, Sort.by("id")));
+        Page<Item> items = itemRepository.findByOwnerIdOrderById(2L, PageRequest.of(0,10));
         assertNotNull(items);
         assertEquals(2L, items.getContent().get(0).getId());
         assertEquals("Кошка", items.getContent().get(0).getName());
@@ -78,10 +78,10 @@ class ItemRepositoryTest {
 
     @Test
     void findByRequestId() {
-        List<Item> item = itemRepository.findByRequestId(1L);
-        assertNotNull(item);
-        assertEquals(1L, item.get(0).getId());
-        assertEquals("Ручка", item.get(0).getName());
-        assertEquals("Писательный инструмент", item.get(0).getDescription());
+        List<Item> items = itemRepository.findByRequestId(1L);
+        assertNotNull(items);
+        assertEquals(1L, items.get(0).getId());
+        assertEquals("Ручка", items.get(0).getName());
+        assertEquals("Писательный инструмент", items.get(0).getDescription());
     }
 }
