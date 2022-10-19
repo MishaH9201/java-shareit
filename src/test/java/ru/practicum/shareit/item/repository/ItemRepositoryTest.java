@@ -66,6 +66,7 @@ class ItemRepositoryTest {
         assertEquals("Ручка", items.get(0).getName());
         assertEquals("Писательный инструмент", items.get(0).getDescription());
     }
+
     @Test
     void testSearchItemsWhenTextIsValid() {
         Page<Item> items = itemRepository.search("пИс", PageRequest.of(0, 10, Sort.by("id")));
