@@ -57,15 +57,6 @@ class ItemRepositoryTest {
         itemRequestRepository.deleteAll();
     }
 
-//    @Test
-//    void testFindByRequestIdWhenIdIsValid() {
-//        List<Item> items = itemRepository.findByRequestId(1L);
-//        assertNotNull(items);
-//        assertEquals(1L, items.get(0).getId());
-//        assertEquals("Ручка", items.get(0).getName());
-//        assertEquals("Писательный инструмент", items.get(0).getDescription());
-//    }
-
     @Test
     void testSearchItemsWhenTextIsValid() {
         Page<Item> items = itemRepository.search("пИс", PageRequest.of(0, 10, Sort.by("id")));
