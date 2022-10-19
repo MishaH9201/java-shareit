@@ -26,11 +26,9 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDtoForComments> get(@RequestHeader(ConstantsProject.USER_ID) long userId,
-                                        @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                        @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        int page = from / size;
-        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id").descending());
-        return itemService.getItems(userId, pageRequest);
+                                        @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                        @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return itemService.getItems(userId, getPageRequest(from, size));
     }
 
     @GetMapping("/{itemId}")
@@ -62,11 +60,9 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text,
-                                @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        int page = from / size;
-        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by("id"));
-        return itemService.search(text, pageRequest);
+                                @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return itemService.search(text, getPageRequest(from, size));
     }
 
     @PostMapping("{itemId}/comment")
@@ -76,4 +72,8 @@ public class ItemController {
         return itemService.createComment(commentDto, userId, itemId);
     }
 
+    private PageRequest getPageRequest(int from, int size) {
+        int page = from / size;
+        return PageRequest.of(page, size, Sort.by("id"));
+    }
 }

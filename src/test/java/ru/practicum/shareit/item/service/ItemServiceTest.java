@@ -33,24 +33,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class ItemServiceTest {
-    ItemService itemService;
-    UserRepository userRepository;
-    ItemRepository itemRepository;
-    BookingRepository bookingRepository;
-    CommentRepository commentRepository;
-    ItemRequestRepository itemRequestRepository;
-    ItemRequest itemRequest;
-    User user1, user2, user3;
-    Item item1;
-    Booking lastBooking, nextBooking;
-    Comment comment;
+    private ItemService itemService;
+    private UserRepository userRepository;
+    private ItemRepository itemRepository;
+    private BookingRepository bookingRepository;
+    private CommentRepository commentRepository;
+    private ItemRequestRepository itemRequestRepository;
+    private ItemRequest itemRequest;
+    private User user1, user2, user3;
+    private Item item1;
+    private Booking lastBooking, nextBooking;
+    private Comment comment;
+    private LocalDateTime date = LocalDateTime.now();
 
     @BeforeEach
     void beforeEach() {
         user1 = new User(1L, "email1@email.com", "Эдуард");
         user2 = new User(2L, "email2@email.com", "Станислав");
         user3 = new User(3L, "email3@email.com", "Растислав");
-        itemRequest = new ItemRequest(1L, "Что-то пишущее", user2, LocalDateTime.now());
+        itemRequest = new ItemRequest(1L, "Что-то пишущее", user2, date);
         item1 = new Item(1L, "Ручка", "Писательный инструмент", true, user1, itemRequest);
         userRepository = mock(UserRepository.class);
         itemRepository = mock(ItemRepository.class);
@@ -61,8 +62,8 @@ class ItemServiceTest {
         lastBooking = Booking
                 .builder()
                 .id(1L)
-                .start(LocalDateTime.now().minusDays(2))
-                .end(LocalDateTime.now().minusDays(2))
+                .start(date.minusDays(2))
+                .end(date.minusDays(2))
                 .booker(user3)
                 .status(BookingStatus.APPROVED)
                 .item(item1)
@@ -70,8 +71,8 @@ class ItemServiceTest {
         nextBooking = Booking
                 .builder()
                 .id(2L)
-                .start(LocalDateTime.now().plusHours(1))
-                .end(LocalDateTime.now().plusHours(2))
+                .start(date.plusHours(1))
+                .end(date.plusHours(2))
                 .booker(user3)
                 .status(BookingStatus.APPROVED)
                 .item(item1)
@@ -80,7 +81,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void getItemById() {
+    void testGetItemByIdWhenIdIsValid() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user2));
         when(itemRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(item1));
         when(bookingRepository.findLastBookingWithItemAndOwner(Mockito.any(), Mockito.anyLong()))
@@ -100,7 +101,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void addNewItem() {
+    void testAddNewItem() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user2));
         when(itemRepository.save(Mockito.any())).thenReturn(item1);
         when(itemRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(itemRequest));
@@ -111,7 +112,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void getItems() {
+    void testGetItems() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user2));
         when(itemRepository.findByOwnerIdOrderById(Mockito.anyLong(), Mockito.any()))
                 .thenReturn(new PageImpl<>(List.of(item1)));
@@ -134,7 +135,7 @@ class ItemServiceTest {
 
 
     @Test
-    void updateItem() {
+    void testUpdateItem() {
         Item itemUpdate = new Item(1L, "Карандаш", "Писательный инструмент", true, user1, itemRequest);
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user1));
         when(itemRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(item1));
@@ -147,7 +148,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void search() {
+    void testSearchItems() {
         PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("id").descending());
         when(itemRepository.search(Mockito.any(), Mockito.any())).thenReturn(new PageImpl<>(List.of(item1)));
         List<ItemDto> itemsTest = itemService.search("Руч", pageRequest);
@@ -157,7 +158,7 @@ class ItemServiceTest {
     }
 
     @Test
-    void createComment() {
+    void testCreateComment() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user1));
         when(itemRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(item1));
         when(commentRepository.save(Mockito.any())).thenReturn(comment);

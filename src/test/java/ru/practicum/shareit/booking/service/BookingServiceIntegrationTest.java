@@ -34,24 +34,25 @@ public class BookingServiceIntegrationTest {
     private final UserService userService;
     private final ItemService itemService;
     private final BookingService bookingService;
-    ItemRequest itemRequest;
-    User user1, user2, user3;
-    Item item1, item2;
-    Booking lastBooking, nextBooking;
+    private ItemRequest itemRequest;
+    private User user1, user2, user3;
+    private Item item1, item2;
+    private Booking lastBooking, nextBooking;
+    private LocalDateTime date = LocalDateTime.now();
 
     @BeforeEach
     void beforeEach() {
         user1 = new User(1L, "email1@email.com", "Эдуард");
         user2 = new User(2L, "email2@email.com", "Станислав");
         user3 = new User(3L, "email3@email.com", "Растислав");
-        itemRequest = new ItemRequest(1L, "Что-то пишущее", user2, LocalDateTime.now());
+        itemRequest = new ItemRequest(1L, "Что-то пишущее", user2, date);
         item1 = new Item(1L, "Ручка", "Писательный инструмент", true, user1, itemRequest);
         item2 = new Item(2L, "Карандаш", "Писательный инструмент", true, user2, null);
         lastBooking = Booking
                 .builder()
                 .id(1L)
-                .start(LocalDateTime.now().minusDays(2))
-                .end(LocalDateTime.now().minusDays(2))
+                .start(date.minusDays(2))
+                .end(date.minusDays(2))
                 .booker(user3)
                 .status(BookingStatus.APPROVED)
                 .item(item1)
@@ -59,8 +60,8 @@ public class BookingServiceIntegrationTest {
         nextBooking = Booking
                 .builder()
                 .id(2L)
-                .start(LocalDateTime.now().plusHours(1))
-                .end(LocalDateTime.now().plusHours(2))
+                .start(date.plusHours(1))
+                .end(date.plusHours(2))
                 .booker(user3)
                 .status(BookingStatus.WAITING)
                 .item(item2)
@@ -68,7 +69,7 @@ public class BookingServiceIntegrationTest {
     }
 
     @Test
-    void findAllBookingsByUserId() {
+    void testFindAllBookingsByUserIdWhenIdIsValid() {
         user1 = userService.saveUser(user1);
         user2 = userService.saveUser(user2);
         user3 = userService.saveUser(user3);

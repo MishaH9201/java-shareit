@@ -18,9 +18,9 @@ import static org.mockito.Mockito.*;
 
 class UserServiceTest {
 
-    UserService userService;
-    UserRepository userRepository;
-    User user1;
+    private UserService userService;
+    private UserRepository userRepository;
+    private User user1;
 
     @BeforeEach
     void beforeEach() {
@@ -30,7 +30,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getAllUsers() {
+    void testGetAllUsers() {
         when(userRepository.findAll()).thenReturn(Collections.singletonList(user1));
         List<UserDto> users = userService.getAllUsers();
         assertNotNull(users);
@@ -41,7 +41,7 @@ class UserServiceTest {
     }
 
     @Test
-    void saveUser() {
+    void testSaveUser() {
         when(userRepository.save(Mockito.any())).thenReturn(user1);
         User userTest = userService.saveUser(user1);
         assertEquals("Эдуард", userTest.getName());
@@ -50,7 +50,7 @@ class UserServiceTest {
     }
 
     @Test
-    void updateUser() {
+    void testUpdateUser() {
         User userUpdate = new User(1L, "email1@email.com", "Николай");
         when(userRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(user1));
         when(userRepository.save(Mockito.any())).thenReturn(userUpdate);
@@ -63,7 +63,7 @@ class UserServiceTest {
     }
 
     @Test
-    void getUserById() {
+    void getUserByIdWhenIdIsValid() {
         when(userRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(user1));
         User userTest = userService.getUserById(1L);
         assertEquals("Эдуард", userTest.getName());
@@ -72,7 +72,7 @@ class UserServiceTest {
     }
 
     @Test
-    void deleteUser() {
+    void testDeleteUser() {
         userService.deleteUser(anyLong());
         Mockito.verify(userRepository, times(1)).deleteById(anyLong());
     }

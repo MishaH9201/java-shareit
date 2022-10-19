@@ -25,16 +25,17 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class BookingServiceTest {
-    BookingRepository bookingRepository;
-    UserRepository userRepository;
-    ItemRepository itemRepository;
-    BookingService bookingService;
+    private BookingRepository bookingRepository;
+    private UserRepository userRepository;
+    private ItemRepository itemRepository;
+    private BookingService bookingService;
 
-    User user1, user2, user3;
-    Item item1;
+    private User user1, user2, user3;
+    private Item item1;
 
-    Booking lastBooking, nextBooking;
-    PageRequest pageRequest;
+    private Booking lastBooking, nextBooking;
+    private PageRequest pageRequest;
+    private LocalDateTime date = LocalDateTime.now();
 
     @BeforeEach
     void beforeEach() {
@@ -49,8 +50,8 @@ class BookingServiceTest {
         lastBooking = Booking
                 .builder()
                 .id(1L)
-                .start(LocalDateTime.now().minusDays(2))
-                .end(LocalDateTime.now().minusDays(2))
+                .start(date.minusDays(2))
+                .end(date.minusDays(2))
                 .booker(user3)
                 .status(BookingStatus.APPROVED)
                 .item(item1)
@@ -58,8 +59,8 @@ class BookingServiceTest {
         nextBooking = Booking
                 .builder()
                 .id(2L)
-                .start(LocalDateTime.now().plusHours(1))
-                .end(LocalDateTime.now().plusHours(2))
+                .start(date.plusHours(1))
+                .end(date.plusHours(2))
                 .booker(user2)
                 .status(BookingStatus.WAITING)
                 .item(item1)
@@ -68,7 +69,7 @@ class BookingServiceTest {
     }
 
     @Test
-    void save() {
+    void testSaveNewBooking() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user2));
         when(itemRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(item1));
         when(bookingRepository.save(Mockito.any())).thenReturn(nextBooking);
@@ -111,7 +112,7 @@ class BookingServiceTest {
     }
 
     @Test
-    void findBookingById() {
+    void testFindBookingByIdWhenIdIsValid() {
         when(bookingRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(nextBooking));
         BookingDtoForUpdate bookingTest = bookingService.findBookingById(nextBooking.getId(), user2.getId());
         assertEquals(2L, bookingTest.getId());

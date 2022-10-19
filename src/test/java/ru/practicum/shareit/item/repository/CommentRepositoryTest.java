@@ -22,14 +22,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CommentRepositoryTest {
     @Autowired
-    CommentRepository commentRepository;
+    private CommentRepository commentRepository;
     @Autowired
-    ItemRepository itemRepository;
+    private ItemRepository itemRepository;
     @Autowired
-    UserRepository userRepository;
-    Item item1, item2;
-    User user1, user2;
-    Comment comment;
+    private UserRepository userRepository;
+    private Item item1, item2;
+    private User user1, user2;
+    private Comment comment;
 
     @BeforeEach
     void beforeEach() {
@@ -53,7 +53,7 @@ class CommentRepositoryTest {
     }
 
     @Test
-    void findByItemId() {
+    void testFindByItemIdWhenIdIsValid() {
         List<Comment> comments = commentRepository.findByItemId(1L);
         assertNotNull(comments);
         assertEquals(1L, comments.get(0).getId());

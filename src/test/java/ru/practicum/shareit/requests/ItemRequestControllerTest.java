@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.practicum.shareit.requests.dto.ItemRequestDto;
 import ru.practicum.shareit.requests.service.ItemRequestService;
@@ -27,13 +28,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class ItemRequestControllerTest {
     @MockBean
-    ItemRequestService itemRequestService;
+    private ItemRequestService itemRequestService;
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
     @Autowired
-    ObjectMapper mapper;
+    private ObjectMapper mapper;
     public final String userId = "X-Sharer-User-Id";
-    ItemRequestDto itemRequestDto;
+    private ItemRequestDto itemRequestDto;
 
     @BeforeEach
     void beforeEach() {
@@ -41,7 +42,7 @@ class ItemRequestControllerTest {
     }
 
     @Test
-    void get() throws Exception {
+    void getWhenIdIsValid() throws Exception {
         when(itemRequestService.getItemRequests(anyLong())).thenReturn(Collections.emptyList());
         mockMvc.perform(MockMvcRequestBuilders.get("/requests")
                         .header(userId, 1L))
@@ -51,7 +52,7 @@ class ItemRequestControllerTest {
     }
 
     @Test
-    void getAll() throws Exception {
+    void testGetAll() throws Exception {
         when(itemRequestService.getAllItemsRequests(anyLong(), any())).thenReturn(Collections.emptyList());
         mockMvc.perform(MockMvcRequestBuilders.get("/requests/all?from={from}&size={size}", 1, 10)
                         .header(userId, 1L))
@@ -61,7 +62,7 @@ class ItemRequestControllerTest {
     }
 
     @Test
-    void getById() throws Exception {
+    void testGetByIdWhenIdIsValid() throws Exception {
         when(itemRequestService.getItemRequestsById(anyLong(), anyLong())).thenReturn(itemRequestDto);
         mockMvc.perform(MockMvcRequestBuilders.get("/requests/{requestId}", 1L)
                         .header(userId, 1L))
@@ -71,16 +72,20 @@ class ItemRequestControllerTest {
     }
 
     @Test
-    void add() throws Exception {
+    void testAddItemRequest() throws Exception {
         when(itemRequestService.addNewItemRequest(any(), anyLong())).thenReturn(itemRequestDto);
-        mockMvc.perform(post("/requests")
-                        .header(userId, 1L)
-                        .content(mapper.writeValueAsString(itemRequestDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+        getMock()
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.description", is(itemRequestDto.getDescription())));
         verify(itemRequestService, times(1)).addNewItemRequest(any(), anyLong());
+    }
+
+    private ResultActions getMock() throws Exception {
+        return mockMvc.perform(post("/requests")
+                .header(userId, 1L)
+                .content(mapper.writeValueAsString(itemRequestDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
     }
 }

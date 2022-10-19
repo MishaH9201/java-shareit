@@ -29,11 +29,9 @@ public class ItemRequestController {
 
     @GetMapping("/all")
     public List<ItemRequestDto> getAll(@RequestHeader(ConstantsProject.USER_ID) long userId,
-                                       @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-                                       @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        int page = from / size;
-        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by("created").descending());
-        return itemRequestService.getAllItemsRequests(userId, pageRequest);
+                                       @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                       @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return itemRequestService.getAllItemsRequests(userId, getPageRequest(from, size));
     }
 
     @GetMapping("/{requestId}")
@@ -49,6 +47,10 @@ public class ItemRequestController {
         return itemRequestService.addNewItemRequest(itemRequestDto, userId);
     }
 
+    private PageRequest getPageRequest(int from, int size) {
+        int page = from / size;
+        return PageRequest.of(page, size, Sort.by("created"));
+    }
 
 }
 

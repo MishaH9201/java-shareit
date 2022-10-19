@@ -26,13 +26,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class ItemRequestServiceImplTest {
-    ItemRequestService itemRequestService;
-    UserRepository userRepository;
-    ItemRepository itemRepository;
-    ItemRequestRepository itemRequestRepository;
-    ItemRequest itemRequest;
-    User user1, user2;
-    Item item1;
+    private ItemRequestService itemRequestService;
+    private UserRepository userRepository;
+    private ItemRepository itemRepository;
+    private ItemRequestRepository itemRequestRepository;
+    private ItemRequest itemRequest;
+    private User user1, user2;
+    private Item item1;
 
     @BeforeEach
     void beforeEach() {
@@ -47,7 +47,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void addNewItemRequest() {
+    void testAddNewItemRequest() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user2));
         when(itemRequestRepository.save(Mockito.any())).thenReturn(itemRequest);
         ItemDto itemDto = ItemMapper.toItemDto(item1);
@@ -59,7 +59,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void getItemRequests() {
+    void getItemRequestsWhenIdIsValid() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user2));
         when(itemRepository.findByRequestId(Mockito.anyLong())).thenReturn(Collections.singletonList(item1));
         when(itemRequestRepository.findByRequestorId(Mockito.any())).thenReturn(Collections.singletonList(itemRequest));
@@ -70,7 +70,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void getItemRequestsById() {
+    void getItemRequestsByIdWhenIdIsValid() {
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user2));
         when(itemRepository.findByRequestId(Mockito.anyLong())).thenReturn(Collections.singletonList(item1));
         when(itemRequestRepository.findById(Mockito.any())).thenReturn(Optional.ofNullable(itemRequest));
@@ -81,7 +81,7 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void getAllItemsRequests() {
+    void testGetAllItemsRequests() {
         PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("id").descending());
         when(userRepository.findById(Mockito.anyLong())).thenReturn(Optional.ofNullable(user2));
         when(itemRepository.findByRequestId(Mockito.anyLong())).thenReturn(Collections.singletonList(item1));

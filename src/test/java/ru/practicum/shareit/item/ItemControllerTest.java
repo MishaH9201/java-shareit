@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -30,15 +31,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class ItemControllerTest {
     @MockBean
-    ItemService itemService;
+    private ItemService itemService;
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
     @Autowired
-    ObjectMapper mapper;
-    ItemDto itemDto;
-    ItemDtoForComments itemDtoForComments;
-    Item item;
-    CommentDto comment;
+    private ObjectMapper mapper;
+    private ItemDto itemDto;
+    private ItemDtoForComments itemDtoForComments;
+    private Item item;
+    private CommentDto comment;
     public final String userId = "X-Sharer-User-Id";
 
     @BeforeEach
@@ -51,7 +52,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void get() throws Exception {
+    void testGetItem() throws Exception {
         when(itemService.getItems(anyLong(), any())).thenReturn(Collections.emptyList());
         mockMvc.perform(MockMvcRequestBuilders.get("/items")
                         .header(userId, 1L))
@@ -61,7 +62,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void getById() throws Exception {
+    void getItemByIdWhenIdIsValid() throws Exception {
         when(itemService.getItemById(anyLong(), anyLong())).thenReturn(itemDtoForComments);
         mockMvc.perform(MockMvcRequestBuilders.get("/items/{itemId}", 1L)
                         .header(userId, 1L))
@@ -72,7 +73,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void add() throws Exception {
+    void testAddItem() throws Exception {
         when(itemService.addNewItem(any(), any())).thenReturn(item);
         mockMvc.perform(post("/items")
                         .header(userId, 1L)
@@ -87,7 +88,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void deleteItem() throws Exception {
+    void testDeleteItem() throws Exception {
         mockMvc.perform(delete("/items/{itemId}", 1L)
                         .header(userId, 1L))
                 .andExpect(status().isOk());
@@ -95,7 +96,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void update() throws Exception {
+    void testUpdateItem() throws Exception {
         when(itemService.updateItem(anyLong(), any())).thenReturn(item);
         mockMvc.perform(patch("/items/{itemId}", 1L)
                         .header(userId, 1L)
@@ -110,7 +111,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void search() throws Exception {
+    void testSearchWhenTextIsValid() throws Exception {
         when(itemService.search(any(), any())).thenReturn(Collections.emptyList());
         mockMvc.perform(MockMvcRequestBuilders.get("/items/search?text={text}&from={from}&size={size}",
                         "text", 1, 1))
@@ -120,7 +121,7 @@ class ItemControllerTest {
     }
 
     @Test
-    void addComment() throws Exception {
+    void testAddComment() throws Exception {
         when(itemService.createComment(any(), anyLong(), anyLong())).thenReturn(comment);
         mockMvc.perform(post("/items/{itemId}/comment", 1L)
                         .header(userId, 1L)
@@ -133,4 +134,5 @@ class ItemControllerTest {
                 .andExpect(jsonPath("$.authorName", is(comment.getAuthorName())));
         verify(itemService, times(1)).createComment(any(), anyLong(), anyLong());
     }
+
 }

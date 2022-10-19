@@ -17,11 +17,11 @@ import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 class ItemRequestRepositoryTest {
     @Autowired
-    ItemRequestRepository itemRequestRepository;
+    private ItemRequestRepository itemRequestRepository;
     @Autowired
-    UserRepository userRepository;
-    User user1;
-    ItemRequest itemRequest;
+    private UserRepository userRepository;
+    private User user1;
+    private ItemRequest itemRequest;
 
     @BeforeEach
     void beforeEach() {
@@ -38,7 +38,7 @@ class ItemRequestRepositoryTest {
     }
 
     @Test
-    void findByRequestorId() {
+    void findByRequestorIdWhenIdIsValid() {
         List<ItemRequest> itemRequests = itemRequestRepository.findByRequestorId(1L);
         assertNotNull(itemRequests);
         assertEquals(1L, itemRequests.get(0).getId());

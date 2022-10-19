@@ -28,14 +28,14 @@ import static org.junit.jupiter.api.Assertions.*;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class ItemRepositoryTest {
     @Autowired
-    ItemRepository itemRepository;
+    private ItemRepository itemRepository;
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
     @Autowired
-    ItemRequestRepository itemRequestRepository;
-    Item item1, item2;
-    User user1, user2;
-    ItemRequest itemRequest;
+    private ItemRequestRepository itemRequestRepository;
+    private Item item1, item2;
+    private User user1, user2;
+    private ItemRequest itemRequest;
 
     @BeforeEach
     void beforeEach() {
@@ -59,7 +59,7 @@ class ItemRepositoryTest {
     }
 
     @Test
-    void search() {
+    void testSearchItemsWhenTextIsValid() {
         Page<Item> items = itemRepository.search("пИс", PageRequest.of(0, 10, Sort.by("id")));
         assertNotNull(items);
         assertEquals(1L, items.getContent().get(0).getId());
@@ -67,17 +67,9 @@ class ItemRepositoryTest {
         assertEquals("Писательный инструмент", items.getContent().get(0).getDescription());
     }
 
-//    @Test
-//    void findByOwnerIdOrderById() {
-//        Page<Item> items = itemRepository.findByOwnerIdOrderById(2L, PageRequest.of(0,10));
-//        assertNotNull(items);
-//        assertEquals(2L, items.getContent().get(0).getId());
-//        assertEquals("Кошка", items.getContent().get(0).getName());
-//        assertEquals("Мяукательный инструмент", items.getContent().get(0).getDescription());
-//    }
 
     @Test
-    void findByRequestId() {
+    void testFindByRequestIdWhenIdIsValid() {
         List<Item> items = itemRepository.findByRequestId(1L);
         assertNotNull(items);
         assertEquals(1L, items.get(0).getId());

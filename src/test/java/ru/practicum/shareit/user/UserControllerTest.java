@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
@@ -29,13 +30,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class UserControllerTest {
     @MockBean
-    UserService userService;
+    private UserService userService;
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
     @Autowired
-    ObjectMapper mapper;
-    UserDto userDto;
-    User user;
+    private ObjectMapper mapper;
+    private UserDto userDto;
+    private User user;
 
     @BeforeEach
     void beforeEach() {
@@ -44,7 +45,7 @@ class UserControllerTest {
     }
 
     @Test
-    void getAllUsers() throws Exception {
+    void testGetAllUsers() throws Exception {
         when(userService.getAllUsers()).thenReturn(Collections.emptyList());
         mockMvc.perform(MockMvcRequestBuilders.get("/users"))
                 .andExpect(status().isOk())
@@ -54,7 +55,7 @@ class UserControllerTest {
     }
 
     @Test
-    void getUserById() throws Exception {
+    void getUserByIdWhenIdIsValid() throws Exception {
         when(userService.getUserById(any())).thenReturn(user);
         mockMvc.perform(get("/users/{userId}", 1))
                 .andExpect(status().isOk())
@@ -64,13 +65,9 @@ class UserControllerTest {
     }
 
     @Test
-    void saveNewUser() throws Exception {
+    void testSaveNewUser() throws Exception {
         when(userService.saveUser(any())).thenReturn(user);
-        mockMvc.perform(post("/users")
-                        .content(mapper.writeValueAsString(userDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+        getMockPost()
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
                 .andExpect(jsonPath("$.name", is(userDto.getName())))
@@ -80,14 +77,10 @@ class UserControllerTest {
 
 
     @Test
-    void updateUser() throws Exception {
+    void testUpdateUser() throws Exception {
         when(userService.updateUser(any(), any()))
                 .thenReturn(user);
-        mockMvc.perform(patch("/users/{userId}", 1L)
-                        .content(mapper.writeValueAsString(userDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+        getMockPatch()
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(userDto.getId()), Long.class))
                 .andExpect(jsonPath("$.name", is(userDto.getName())))
@@ -96,9 +89,25 @@ class UserControllerTest {
     }
 
     @Test
-    void deleteUser() throws Exception {
+    void testDeleteUser() throws Exception {
         mockMvc.perform(delete("/users/{userId}", 1L))
                 .andExpect(status().isOk());
         verify(userService, times(1)).deleteUser(1L);
+    }
+
+    private ResultActions getMockPost() throws Exception {
+        return mockMvc.perform(post("/users")
+                .content(mapper.writeValueAsString(userDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
+    }
+
+    private ResultActions getMockPatch() throws Exception {
+        return mockMvc.perform(patch("/users/{userId}", 1L)
+                .content(mapper.writeValueAsString(userDto))
+                .characterEncoding(StandardCharsets.UTF_8)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON));
     }
 }

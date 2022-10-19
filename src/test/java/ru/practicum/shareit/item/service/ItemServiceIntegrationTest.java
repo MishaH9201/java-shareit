@@ -44,7 +44,7 @@ public class ItemServiceIntegrationTest {
     }
 
     @Test
-    void getItems() {
+    void testIntegrationGetItems() {
         user1 = userService.saveUser(user1);
         user2 = userService.saveUser(user2);
         Item itemTest1 = itemService.addNewItem(ItemMapper.toItemDto(item1), user1.getId());

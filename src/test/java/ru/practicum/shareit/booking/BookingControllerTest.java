@@ -34,32 +34,33 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class BookingControllerTest {
     @MockBean
-    BookingService bookingService;
+    private BookingService bookingService;
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
     @Autowired
-    ObjectMapper mapper;
-    Booking booking;
-    BookingDto bookingDto;
-    BookingDtoForUpdate bookingDtoForUpdate;
-    Item item;
+    private ObjectMapper mapper;
+    private Booking booking;
+    private BookingDto bookingDto;
+    private BookingDtoForUpdate bookingDtoForUpdate;
+    private Item item;
     public final String userId = "X-Sharer-User-Id";
+    private LocalDateTime date = LocalDateTime.now();
 
     @BeforeEach
     void beforeEach() {
         item = new Item(1L, "Pen", "penapple", true, new User(2L, "m@MMM.w", "Jon"), null);
         booking = new Booking(
-                1L, LocalDateTime.now().plusSeconds(1), LocalDateTime.now().plusHours(4),
+                1L, date.plusSeconds(1), date.plusHours(4),
                 item, new User(1L, "q@q.com", "Tim"), BookingStatus.WAITING);
         bookingDto = new BookingDto(
-                1L, LocalDateTime.now().plusDays(1), LocalDateTime.now().plusDays(2),
+                1L, date.plusDays(1), date.plusDays(2),
                 1L, 1L, BookingStatus.WAITING);
-        bookingDtoForUpdate = new BookingDtoForUpdate(1L, LocalDateTime.now().plusSeconds(1), LocalDateTime.now().plusHours(1), item,
+        bookingDtoForUpdate = new BookingDtoForUpdate(1L, date.plusSeconds(1), date.plusHours(1), item,
                 new User(1L, "q@q.com", "Tim"), BookingStatus.WAITING);
     }
 
     @Test
-    void add() throws Exception {
+    void testAddNewBooking() throws Exception {
         when(bookingService.save(any(), anyLong())).thenReturn(booking);
         mockMvc.perform(post("/bookings")
                         .header(userId, 1L)
@@ -74,7 +75,7 @@ class BookingControllerTest {
     }
 
     @Test
-    void update() throws Exception {
+    void testUpdateBooking() throws Exception {
         when(bookingService.update(anyLong(), anyLong(), anyBoolean())).thenReturn(booking);
         mockMvc.perform(patch("/bookings/{bookingId}?approved={approved}", 1L, true)
                         .header(userId, 1L))
@@ -85,7 +86,7 @@ class BookingControllerTest {
     }
 
     @Test
-    void findBookingById() throws Exception {
+    void testFindBookingByIdWhenIdIsValid() throws Exception {
         when(bookingService.findBookingById(anyLong(), anyLong())).thenReturn(bookingDtoForUpdate);
         mockMvc.perform(MockMvcRequestBuilders.get("/bookings/{bookingId}", 1L)
                         .header(userId, 1L))
@@ -96,7 +97,7 @@ class BookingControllerTest {
     }
 
     @Test
-    void findAllBookingsByUserId() throws Exception {
+    void testFindAllBookingsByUserIdWhenIdIsValid() throws Exception {
         when(bookingService.findAllBookingsByUserId(anyLong(), any(), any())).thenReturn(Collections.emptyList());
         mockMvc.perform(MockMvcRequestBuilders.get("/bookings?from={from}&size={size}", 1, 10)
                         .header(userId, 1L))
@@ -106,7 +107,7 @@ class BookingControllerTest {
     }
 
     @Test
-    void findAllBookingsForItemsUser() throws Exception {
+    void testFindAllBookingsForItemsUser() throws Exception {
         when(bookingService.findAllBookingsForItemsUser(anyLong(), any(), any())).thenReturn(Collections.emptyList());
         mockMvc.perform(MockMvcRequestBuilders.get("/bookings/owner?from={from}&size={size}", 1, 10)
                         .header(userId, 1L))

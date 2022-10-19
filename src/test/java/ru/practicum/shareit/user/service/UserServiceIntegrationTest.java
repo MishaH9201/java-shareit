@@ -25,7 +25,7 @@ public class UserServiceIntegrationTest {
     private final UserService userService;
 
     @Test
-    void getAllUsers() {
+    void testIntegrationGetAllUsers() {
         User user1 = userService.saveUser(new User(1L, "a@a.ru", "Ed"));
         User user2 = userService.saveUser(new User(2L, "b@a.ru", "Edy"));
         TypedQuery<User> query = em.createQuery("Select u from User u", User.class);

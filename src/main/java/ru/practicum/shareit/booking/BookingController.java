@@ -27,7 +27,7 @@ public class BookingController {
 
     @PostMapping
     public BookingDtoForUpdate add(@Valid @RequestHeader(ConstantsProject.USER_ID) Long userId,
-                          @Valid @RequestBody BookingDto bookingDto) {
+                                   @Valid @RequestBody BookingDto bookingDto) {
         Booking booking = bookingService.save(bookingDto, userId);
         return BookingMapper.toBookingDtoForUpdate(booking);
     }
@@ -50,22 +50,23 @@ public class BookingController {
     @GetMapping
     public List<BookingDtoForUpdate> findAllBookingsByUserId(
             @RequestHeader(ConstantsProject.USER_ID) Long userId,
-             @RequestParam(required = false, defaultValue = "ALL") String state,
-             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
-        int page = from / size;
-        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by("start").descending());
-        return bookingService.findAllBookingsByUserId(userId, state, pageRequest);
+            @RequestParam(required = false, defaultValue = "ALL") String state,
+            @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+            @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return bookingService.findAllBookingsByUserId(userId, state, getPageRequest(from, size));
     }
 
     @GetMapping("/owner")
     public List<BookingDtoForUpdate> findAllBookingsForItemsUser(
             @RequestHeader(ConstantsProject.USER_ID) Long userId,
-             @RequestParam(required = false, defaultValue = "ALL") String state,
-             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
-             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
+            @RequestParam(required = false, defaultValue = "ALL") String state,
+            @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+            @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return bookingService.findAllBookingsForItemsUser(userId, state, getPageRequest(from, size));
+    }
+
+    private PageRequest getPageRequest(int from, int size) {
         int page = from / size;
-        final PageRequest pageRequest = PageRequest.of(page, size, Sort.by("start").descending());
-        return bookingService.findAllBookingsForItemsUser(userId, state, pageRequest);
+        return PageRequest.of(page, size, Sort.by("start").descending());
     }
 }
