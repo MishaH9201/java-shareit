@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Test;
 
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -58,14 +57,14 @@ class ItemRepositoryTest {
         itemRequestRepository.deleteAll();
     }
 
-    @Test
-    void testFindByRequestIdWhenIdIsValid() {
-        List<Item> items = itemRepository.findByRequestId(1L);
-        assertNotNull(items);
-        assertEquals(1L, items.get(0).getId());
-        assertEquals("Ручка", items.get(0).getName());
-        assertEquals("Писательный инструмент", items.get(0).getDescription());
-    }
+//    @Test
+//    void testFindByRequestIdWhenIdIsValid() {
+//        List<Item> items = itemRepository.findByRequestId(1L);
+//        assertNotNull(items);
+//        assertEquals(1L, items.get(0).getId());
+//        assertEquals("Ручка", items.get(0).getName());
+//        assertEquals("Писательный инструмент", items.get(0).getDescription());
+//    }
 
     @Test
     void testSearchItemsWhenTextIsValid() {
