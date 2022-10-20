@@ -1,4 +1,4 @@
-
+DROP  TABLE IF EXISTS users , requests, items, bookings, comments CASCADE;
 
 
 CREATE TABLE IF NOT EXISTS users (
@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS items (
    description VARCHAR(1000),
    available BOOLEAN DEFAULT FALSE,
    owner_id int REFERENCES users(id),
-    request_id int REFERENCES requests(id)
+   request_id int REFERENCES requests(id)
 );
 
 CREATE TABLE IF NOT EXISTS bookings(

@@ -1,16 +1,21 @@
 package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDtoForComments;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.util.ConstantsProject;
 
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -20,8 +25,10 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public List<ItemDtoForComments> get(@RequestHeader(ConstantsProject.USER_ID) long userId) {
-        return itemService.getItems(userId);
+    public List<ItemDtoForComments> get(@RequestHeader(ConstantsProject.USER_ID) long userId,
+                                        @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                        @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return itemService.getItems(userId, getPageRequest(from, size));
     }
 
     @GetMapping("/{itemId}")
@@ -33,7 +40,8 @@ public class ItemController {
     @PostMapping
     public ItemDto add(@Valid @RequestHeader(ConstantsProject.USER_ID) Long userId,
                        @Valid @RequestBody ItemDto itemDto) {
-        return ItemMapper.toItemDto(itemService.addNewItem(itemDto, userId));
+        Item item = itemService.addNewItem(itemDto, userId);
+        return ItemMapper.toItemDto(item);
     }
 
     @DeleteMapping("/{itemId}")
@@ -47,14 +55,14 @@ public class ItemController {
                           @PathVariable long itemId,
                           @RequestBody ItemDto itemDto) {
         itemDto.setId(itemId);
-        itemService.updateItem(userId, itemDto);
         return ItemMapper.toItemDto(itemService.updateItem(userId, itemDto));
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam String text) {
-        itemService.search(text);
-        return itemService.search(text);
+    public List<ItemDto> search(@RequestParam String text,
+                                @PositiveOrZero @RequestParam(defaultValue = "0") Integer from,
+                                @Positive @RequestParam(defaultValue = "10") Integer size) {
+        return itemService.search(text, getPageRequest(from, size));
     }
 
     @PostMapping("{itemId}/comment")
@@ -64,4 +72,8 @@ public class ItemController {
         return itemService.createComment(commentDto, userId, itemId);
     }
 
+    private PageRequest getPageRequest(int from, int size) {
+        int page = from / size;
+        return PageRequest.of(page, size, Sort.by("id"));
+    }
 }

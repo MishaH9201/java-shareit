@@ -1,5 +1,7 @@
 package ru.practicum.shareit.booking.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.model.Booking;
@@ -11,48 +13,50 @@ import java.util.Optional;
 public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findByBookerId(Long userId);
 
-    List<Booking> findByBookerIdAndStatus(Long bookerId, BookingStatus status);
+    Page<Booking> findAllByBookerId(Long userId, PageRequest pageRequest);
+
+    Page<Booking> findByBookerIdAndStatus(Long bookerId, BookingStatus status, PageRequest pageRequest);
 
     @Query("select b from Booking b " +
             " where b.booker.id = ?1 and b.end > current_timestamp " +
             "and b.start <= current_timestamp " +
             "order by b.start desc")
-    List<Booking> findCorrentBookingsByBookerId(Long userId);
+    Page<Booking> findCorrentBookingsByBookerId(Long userId,PageRequest pageRequest);
 
     @Query("select b from Booking b " +
             " where b.booker.id = ?1 and b.end > current_timestamp " +
             "and b.start > current_timestamp " +
             "order by b.start desc")
-    List<Booking> findUpcomingBookingsByBookerId(Long userId);
+    Page<Booking> findUpcomingBookingsByBookerId(Long userId,PageRequest pageRequest);
 
     @Query("select b from Booking b " +
             " where b.booker.id = ?1 and b.end < current_timestamp " +
             "order by b.start desc")
-    List<Booking> findPastBookingsByBookerId(Long userId);
+    Page<Booking> findPastBookingsByBookerId(Long userId,PageRequest pageRequest);
 
     @Query("select b from Booking b " +
             " left join Item c on b.item.id = c.id " +
             " where c.owner.id = ?1 order by b.start desc")
-    List<Booking> findBookingsItemsUser(Long userId);
+    Page<Booking> findBookingsItemsUser(Long userId,PageRequest pageRequest);
 
     @Query("select b from Booking b " +
             " left join Item c on b.item.id = c.id " +
             " where c.owner.id = ?1 and b.end > current_timestamp " +
             "order by b.start desc")
-    List<Booking> findUpcomingBookingsItemsUser(Long userId);
+    Page<Booking> findUpcomingBookingsItemsUser(Long userId,PageRequest pageRequest);
 
     @Query("select b from Booking b " +
             " left join Item c on b.item.id = c.id " +
             " where c.owner.id = ?1 and b.end > current_timestamp " +
             "and b.start <= current_timestamp " +
             "order by b.start desc")
-    List<Booking> findCurrentBookingsItemsUser(Long userId);
+    Page<Booking> findCurrentBookingsItemsUser(Long userId,PageRequest pageRequest);
 
     @Query("select b from Booking b " +
             " left join Item c on b.item.id = c.id " +
             " where c.owner.id = ?1 and b.end < current_timestamp " +
             "order by b.start desc")
-    List<Booking> findPastBookingsItemsUser(Long userId);
+    Page<Booking> findPastBookingsItemsUser(Long userId,PageRequest pageRequest);
 
     Optional<Booking> getTopByItem_IdAndBooker_IdOrderByEndAsc(Long itemId, Long userId);
 
@@ -60,13 +64,13 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
             " left join Item c on b.item.id = c.id " +
             " where c.owner.id = ?1 and upper( b.status) = 'WAITING' " +
             "order by b.start desc")
-    List<Booking> findByItemOwnerIdAndStatusWaiting(Long bookerId, BookingStatus status);
+    Page<Booking> findByItemOwnerIdAndStatusWaiting(Long bookerId, BookingStatus status,PageRequest pageRequest);
 
     @Query("select b from Booking b " +
             " left join Item c on b.item.id = c.id " +
             " where c.owner.id = ?1 and upper( b.status) = 'REJECTED' " +
             "order by b.start desc")
-    List<Booking> findByItemOwnerIdAndStatusRejected(Long bookerId, BookingStatus status);
+    Page<Booking> findByItemOwnerIdAndStatusRejected(Long bookerId, BookingStatus status,PageRequest pageRequest);
 
     @Query("SELECT b " +
             "FROM Booking b " +
