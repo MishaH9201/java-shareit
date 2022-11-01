@@ -5,7 +5,6 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
-//import javax.validation.constraints.FutureOrPresent;
 import java.time.LocalDateTime;
 
 @Getter
@@ -15,9 +14,7 @@ import java.time.LocalDateTime;
 @Builder
 public class BookingDtoForUpdate {
     private Long id;
-   // @FutureOrPresent
     private LocalDateTime start;
-  //  @FutureOrPresent
     private LocalDateTime end;
     private Item item;
     private User booker;

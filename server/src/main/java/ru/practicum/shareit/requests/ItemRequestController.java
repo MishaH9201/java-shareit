@@ -1,6 +1,7 @@
 package ru.practicum.shareit.requests;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
@@ -11,7 +12,7 @@ import ru.practicum.shareit.util.ConstantsProject;
 
 import java.util.List;
 
-
+@Slf4j
 @RestController
 @RequestMapping(path = "/requests")
 @AllArgsConstructor
@@ -21,6 +22,7 @@ public class ItemRequestController {
 
     @GetMapping
     public List<ItemRequestDto> get(@RequestHeader(ConstantsProject.USER_ID) long userId) {
+
         return itemRequestService.getItemRequests(userId);
     }
 
@@ -28,12 +30,14 @@ public class ItemRequestController {
     public List<ItemRequestDto> getAll(@RequestHeader(ConstantsProject.USER_ID) long userId,
                                        @RequestParam(defaultValue = "0") Integer from,
                                        @RequestParam(defaultValue = "10") Integer size) {
+        log.info("Get requests with , userId={}, from={}, size={}",  userId, from, size);
         return itemRequestService.getAllItemsRequests(userId, getPageRequest(from, size));
     }
 
     @GetMapping("/{requestId}")
     public ItemRequestDto getById(@RequestHeader(ConstantsProject.USER_ID) long userId,
                                   @PathVariable("requestId") long requestId) {
+        log.info("Get request with, requestId={} userId={}",requestId,  userId);
         return itemRequestService.getItemRequestsById(userId, requestId);
     }
 
