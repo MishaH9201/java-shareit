@@ -12,10 +12,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.util.ConstantsProject;
 
-
-//import javax.validation.Valid;
-//import javax.validation.constraints.Positive;
-//import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -26,8 +22,8 @@ public class ItemController {
 
     @GetMapping
     public List<ItemDtoForComments> get(@RequestHeader(ConstantsProject.USER_ID) long userId,
-                                      /*  @PositiveOrZero*/ @RequestParam(defaultValue = "0") Integer from,
-                                       /* @Positive*/ @RequestParam(defaultValue = "10") Integer size) {
+                                        @RequestParam(defaultValue = "0") Integer from,
+                                        @RequestParam(defaultValue = "10") Integer size) {
         return itemService.getItems(userId, getPageRequest(from, size));
     }
 
@@ -38,8 +34,8 @@ public class ItemController {
     }
 
     @PostMapping
-    public ItemDto add(/*@Valid */@RequestHeader(ConstantsProject.USER_ID) Long userId,
-                       /*@Valid*/ @RequestBody ItemDto itemDto) {
+    public ItemDto add(@RequestHeader(ConstantsProject.USER_ID) Long userId,
+                       @RequestBody ItemDto itemDto) {
         Item item = itemService.addNewItem(itemDto, userId);
         return ItemMapper.toItemDto(item);
     }
@@ -60,14 +56,14 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> search(@RequestParam String text,
-                              /*  @PositiveOrZero*/ @RequestParam(defaultValue = "0") Integer from,
-                             /*   @Positive*/ @RequestParam(defaultValue = "10") Integer size) {
+                                @RequestParam(defaultValue = "0") Integer from,
+                                @RequestParam(defaultValue = "10") Integer size) {
         return itemService.search(text, getPageRequest(from, size));
     }
 
     @PostMapping("{itemId}/comment")
     public CommentDto addComment(@RequestHeader(ConstantsProject.USER_ID) Long userId,
-                                /* @Valid*/ @RequestBody CommentDto commentDto,
+                                 @RequestBody CommentDto commentDto,
                                  @PathVariable long itemId) {
         return itemService.createComment(commentDto, userId, itemId);
     }
